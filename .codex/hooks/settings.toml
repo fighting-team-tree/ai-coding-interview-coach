@@ -1,0 +1,9 @@
+platform = "auto"
+
+[windows]
+shell = "auto"
+shell_order = ["pwsh", "powershell", "cmd"]
+
+[python]
+unix_launchers = ["python3", "python"]
+windows_launchers = ["py -3", "python", "python3"]

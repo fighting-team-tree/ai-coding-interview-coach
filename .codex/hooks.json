@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .codex/hooks/session_start_policy.py",
+            "command": "pwsh -NoProfile -Command \"& { python '.codex/hooks/session_start_policy.py' }\"",
             "timeout": 10
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .codex/hooks/stop_require_validation.py",
+            "command": "pwsh -NoProfile -Command \"& { python '.codex/hooks/stop_require_validation.py' }\"",
             "timeout": 10
           }
         ]

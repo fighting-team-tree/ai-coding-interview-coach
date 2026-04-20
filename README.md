@@ -59,13 +59,24 @@ npm run verify
 This repository now ships project-level Codex hook config in `.codex/`.
 
 - `.codex/config.toml` enables `codex_hooks`
+- `.codex/hooks/settings.toml` is the source of truth for platform and shell policy
+- `.codex/hooks/render_hooks.py` renders the active `.codex/hooks.json`
 - `.codex/hooks.json` injects the verification policy at session start
 - the `Stop` hook checks whether the relevant verification commands succeeded before the task ends
 
-Important limitation:
+Render the hook file after changing shell policy or moving between operating systems:
 
-- OpenAI Codex hooks are currently disabled on native Windows. To get actual hook enforcement, run Codex from WSL/Linux against this same repository.
-- Windows users still get the same verification commands and the Linux CI workflow in `.github/workflows/verify.yml`.
+```bash
+python .codex/hooks/render_hooks.py
+```
+
+Windows shell defaults to `auto`, which prefers `pwsh`, then `powershell`, then `cmd`.
+You can override it when needed:
+
+```bash
+python .codex/hooks/render_hooks.py --windows-shell pwsh
+python .codex/hooks/render_hooks.py --windows-shell cmd
+```
 
 ## Deploy notes
 

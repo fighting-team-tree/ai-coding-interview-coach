@@ -143,7 +143,8 @@ def build_session_start_context() -> str:
         "- After changing files under apps/api, run `npm run verify:api` before ending the task.\n"
         "- If both areas changed, run both or the root `npm run verify`.\n"
         "- Docs-only and data-only changes do not require verification.\n"
-        "- Codex hooks are currently disabled on native Windows. Run Codex from WSL/Linux for actual hook enforcement."
+        "- Project hooks are rendered from `.codex/hooks/settings.toml` into `.codex/hooks.json`.\n"
+        "- Windows uses the configured shell policy (`auto` defaults to `pwsh -> powershell -> cmd`)."
     )
 
 
