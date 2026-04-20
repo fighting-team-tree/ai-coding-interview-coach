@@ -15,3 +15,59 @@ __pycache__/
 apps/api/.env
 apps/web/.env.local
 
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100/
+.Trashes/
+.fseventsd
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+.directory
+
+# WSL2 / Linux CLI and editor temp files
+*~
+.*.swp
+.*.swo
+*.swp
+*.swo
+nohup.out
+.nfs*
+
+# Windows alternate data streams visible from WSL
+*:Zone.Identifier
+*:encryptable
+
+# IDE and editor settings
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Python tooling and coverage
+.coverage
+coverage/
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.eggs/
+*.egg-info/
+
+# Local databases and temp directories
+*.db
+*.sqlite
+tmp/
+
+# Node and frontend caches
+.turbo/
+.pnpm-store/
