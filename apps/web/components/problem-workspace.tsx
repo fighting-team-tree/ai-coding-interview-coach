@@ -15,6 +15,7 @@ import {
   submitAnswer,
   submitCode,
 } from "@/lib/api";
+import type { SessionStatus } from "@/lib/api";
 
 type WorkspaceProps = {
   problemId: string;
@@ -24,21 +25,32 @@ const MAX_INTERVIEW_TURNS = 4;
 
 const FLOW_META = {
   normal: {
-    label: "Normal Flow",
+    label: "일반 압박 흐름",
     focus: "취약점 기반 꼬리질문",
     description: "AST와 problem trap을 근거로 코드의 약한 지점을 깊게 파고듭니다.",
   },
   plan_b: {
-    label: "Plan B Flow",
+    label: "확장 검증 흐름",
     focus: "Scale-up 압박 질문",
     description: "정답이 비교적 안정적일 때 더 큰 입력, trade-off, 코드 리뷰 방어로 난도를 올립니다.",
   },
   fallback: {
-    label: "Fallback Flow",
+    label: "복구형 흐름",
     focus: "핵심 개념 복구 질문",
     description: "코드가 복잡하거나 파싱이 불안정할 때 구현 세부보다 접근과 불변식부터 복구합니다.",
   },
 } as const;
+
+const STATUS_META: Record<
+  SessionStatus,
+  { label: string; tone: "neutral" | "active" | "warning" | "success" }
+> = {
+  created: { label: "세션 생성됨", tone: "neutral" },
+  submitted: { label: "코드 분석 중", tone: "warning" },
+  interviewing: { label: "면접 진행 중", tone: "active" },
+  evaluating: { label: "리포트 생성 중", tone: "warning" },
+  completed: { label: "피드백 완료", tone: "success" },
+};
 
 function getMatchedTrap(problem: ProblemDetail, assistantTurns: number) {
   if (assistantTurns <= 0 || problem.traps.length === 0) {
@@ -109,15 +121,16 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
   const reportAxes = report
     ? [
-        { label: "Logical Structure", axis: report.logical_structure },
-        { label: "Technical Accuracy", axis: report.technical_accuracy },
-        { label: "Explanation Clarity", axis: report.explanation_clarity },
+        { label: "논리 구조", axis: report.logical_structure },
+        { label: "기술 정확도", axis: report.technical_accuracy },
+        { label: "설명 명료도", axis: report.explanation_clarity },
       ]
     : [];
 
   const activeFlow = session?.flow_type ? FLOW_META[session.flow_type] : null;
   const matchedTrap = problem ? getMatchedTrap(problem, assistantTurns) : null;
   const primaryExample = problem?.examples[0] ?? null;
+  const statusMeta = session ? STATUS_META[session.status] : STATUS_META.created;
   const reportAverage = reportAxes.length
     ? (reportAxes.reduce((sum, item) => sum + item.axis.score, 0) / reportAxes.length).toFixed(1)
     : null;
@@ -130,26 +143,27 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
   const analysisCards = [
     {
-      title: "Selected Flow",
-      value: activeFlow?.label ?? "Awaiting submission",
-      description: activeFlow?.description ?? "코드 제출 후 AST 프로필에 따라 질문 전략이 자동으로 선택됩니다.",
+      title: "선택된 면접 흐름",
+      value: activeFlow?.label ?? "코드 제출 대기",
+      description:
+        activeFlow?.description ?? "코드 제출 후 AST 프로필에 따라 질문 전략이 자동으로 선택됩니다.",
     },
     {
-      title: "Matched Signal",
-      value: matchedTrap?.signal ?? "No trap yet",
+      title: "감지된 신호",
+      value: matchedTrap?.signal ?? "아직 없음",
       description:
         matchedTrap?.hint ??
         "이 영역은 코드 제출 뒤 AST와 problem trap을 연결해 지금 질문이 나온 이유를 설명합니다.",
     },
     {
-      title: "Question Intent",
-      value: matchedTrap?.interview_focus ?? activeFlow?.focus ?? "Reasoning setup",
+      title: "현재 질문 의도",
+      value: matchedTrap?.interview_focus ?? activeFlow?.focus ?? "답변 준비 단계",
       description:
         session?.current_question ??
         "첫 질문이 시작되면 이번 턴이 무엇을 검증하려는지 명시적으로 보여줍니다.",
     },
     {
-      title: "AI Guardrail",
+      title: "질문 가드레일",
       value: "Fact/Trap controlled",
       description:
         problem?.forbidden_boundaries[0] ??
@@ -252,15 +266,16 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className="eyebrow">{problem.pattern}</div>
           <h1>{problem.title}</h1>
           <p className="muted">{problem.prompt}</p>
-          <div className="pill-row">
+          <div className="pill-row overview-row">
             <span className={`difficulty-pill ${problem.difficulty}`}>{problem.difficulty}</span>
-            <span className="pill">Expected: {problem.expected_complexity}</span>
+            <span className="pill">권장 복잡도 {problem.expected_complexity}</span>
+            <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
             <span className="pill">
-              Turn {assistantTurns} / {MAX_INTERVIEW_TURNS}
+              면접 턴 {assistantTurns} / {MAX_INTERVIEW_TURNS}
             </span>
-            <span className="pill">Mission: explain the why, not only the code</span>
+            <span className="pill">미션: 정답보다 reasoning을 설명하기</span>
           </div>
-          <ul className="constraint-list">
+          <ul className="constraint-list compact-list">
             {problem.constraints.map((constraint) => (
               <li key={constraint}>{constraint}</li>
             ))}
@@ -269,13 +284,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
         <aside className="workspace-brief">
           <div className="brief-block">
-            <div className="eyebrow">Problem Hook</div>
+            <div className="eyebrow">문제 훅</div>
             <p>{problem.elevator_pitch}</p>
           </div>
 
           {primaryExample ? (
             <div className="brief-block">
-              <div className="eyebrow">Representative Example</div>
+              <div className="eyebrow">대표 예시</div>
               <p>
                 <strong>입력</strong> {primaryExample.input}
               </p>
@@ -287,7 +302,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           ) : null}
 
           <div className="brief-block">
-            <div className="eyebrow">Interview Goals</div>
+            <div className="eyebrow">이번 데모 포인트</div>
             <ul className="mini-list">
               {problem.follow_up_goals.map((goal) => (
                 <li key={goal}>{goal}</li>
@@ -297,25 +312,15 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         </aside>
       </section>
 
-      <section className="analysis-grid">
-        {analysisCards.map((card) => (
-          <article key={card.title} className="card analysis-card">
-            <div className="eyebrow">{card.title}</div>
-            <h2>{card.value}</h2>
-            <p className="muted">{card.description}</p>
-          </article>
-        ))}
-      </section>
-
       <section className="split">
         <div className="card code-panel">
           <div className="panel-header">
             <div>
               <div className="eyebrow">Stage 01</div>
-              <h2>Code Submission</h2>
+              <h2>코드 제출</h2>
             </div>
             <button className="primary" onClick={handleSubmitCode} disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Code"}
+              {submitting ? "제출 중..." : "코드 제출"}
             </button>
           </div>
           <p className="panel-copy">
@@ -336,7 +341,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className="judge-box">
               <div className="judge-head">
                 <strong>{session.judge_result.status}</strong>
-                <span className="status-chip">{session.judge_result.mode}</span>
+                <span className={`mode-chip ${session.judge_result.passed ? "success" : "warning"}`}>
+                  {session.judge_result.mode === "judge0" ? "Judge0" : "Demo"}
+                </span>
               </div>
               <p>
                 {session.judge_result.stdout ||
@@ -351,13 +358,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className="panel-header">
             <div>
               <div className="eyebrow">Stage 02</div>
-              <h2>Interview Session</h2>
+              <h2>면접 세션</h2>
             </div>
-            <span className="status-chip">{session.status}</span>
+            <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
           </div>
 
           <div className={`flow-banner ${session.flow_type ?? "idle"}`}>
-            <strong>{activeFlow?.label ?? "Submission pending"}</strong>
+            <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
             <p>
               {activeFlow?.description ??
                 "코드를 제출하면 AST와 trap 신호를 기반으로 면접 플로우가 선택됩니다."}
@@ -401,13 +408,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               onClick={handleSendAnswer}
               disabled={submitting || recoveringReport || !session.current_question}
             >
-              {submitting ? "Sending..." : "Send Answer"}
+              {submitting ? "전송 중..." : "답변 보내기"}
             </button>
           </div>
 
           {session.ast_profile ? (
             <div className="ast-box">
-              <h3>AST Evidence</h3>
+              <h3>AST 근거</h3>
               <div className="stats-grid">
                 <div className="stat-card">
                   <span className="stat-label">parse_ok</span>
@@ -431,19 +438,29 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         </div>
       </section>
 
+      <section className="analysis-grid">
+        {analysisCards.map((card) => (
+          <article key={card.title} className="card analysis-card compact">
+            <div className="eyebrow">{card.title}</div>
+            <h2>{card.value}</h2>
+            <p className="muted">{card.description}</p>
+          </article>
+        ))}
+      </section>
+
       {report ? (
         <section className="card report-section">
           <div className="report-header">
             <div>
               <div className="eyebrow">Stage 03</div>
-              <h2>3-Axis Feedback Report</h2>
+              <h2>3축 피드백 리포트</h2>
               <p>{report.summary}</p>
             </div>
             <div className="report-score-shell">
               <div className="report-score">{reportAverage}/10</div>
-              <p>overall interview readiness</p>
+              <p>전체 면접 준비도</p>
               <span className="muted">
-                Weakest axis: {weakestAxis?.label ?? "n/a"}
+                가장 약한 축: {weakestAxis?.label ?? "없음"}
               </span>
             </div>
           </div>
@@ -459,7 +476,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                   <span style={{ width: `${axis.score * 10}%` }} />
                 </div>
                 <p>{axis.rationale}</p>
-                <strong>Next step</strong>
+                <strong>다음 연습</strong>
                 <p>{axis.next_step}</p>
               </article>
             ))}
@@ -467,7 +484,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="report-bottom">
             <div className="card subtle share-preview">
-              <div className="eyebrow">Growth Story</div>
+              <div className="eyebrow">성장 포인트</div>
               <h3>공유 가능한 성과물처럼 보이게</h3>
               <p>
                 이 리포트는 단발성 결과가 아니라, 다음 세션에서 어떤 축을 끌어올릴지 연결되는 성장
@@ -476,7 +493,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             </div>
 
             <div className="card subtle">
-              <h3>Recommended drills</h3>
+              <h3>추천 드릴</h3>
               <ul className="constraint-list">
                 {report.recommended_drills.map((drill) => (
                   <li key={drill}>{drill}</li>
@@ -490,7 +507,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       {!report && session.status === "evaluating" ? (
         <section className="card report-recovery">
           <div>
-            <div className="eyebrow">Report Recovery</div>
+            <div className="eyebrow">리포트 복구</div>
             <h2>리포트 생성이 지연되거나 실패했을 수 있습니다.</h2>
             <p className="muted">
               이미 생성된 report를 다시 읽거나, finalize 요청을 한 번 더 보내 복구할 수 있습니다.
@@ -501,7 +518,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             onClick={() => recoverReport(session.id)}
             disabled={recoveringReport || submitting}
           >
-            {recoveringReport ? "Recovering..." : "Recover Report"}
+            {recoveringReport ? "복구 중..." : "리포트 복구"}
           </button>
         </section>
       ) : null}

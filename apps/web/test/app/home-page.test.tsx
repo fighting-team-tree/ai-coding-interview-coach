@@ -25,12 +25,23 @@ describe("HomePage", () => {
     ).toBeInTheDocument();
 
     expect(screen.getByText("Controlled Interview AI")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "대표 데모 시작하기" })).toHaveAttribute(
+      "href",
+      `/problems/${problemCatalog[0].id}`,
+    );
 
-    const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(problemCatalog.length);
+    const scenarioLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("/problems/"));
+    expect(scenarioLinks.length).toBeGreaterThanOrEqual(problemCatalog.length);
 
     for (const problem of problemCatalog) {
-      const title = screen.getByText(problem.title);
+      const title = screen
+        .getAllByText(problem.title)
+        .find((node) => node.closest("a")?.getAttribute("href") === `/problems/${problem.id}`);
+      if (!title) {
+        throw new Error(`Missing scenario link for ${problem.id}`);
+      }
       expect(title).toBeInTheDocument();
       expect(title.closest("a")).toHaveAttribute("href", `/problems/${problem.id}`);
     }
