@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     frontend_origin: str = "http://localhost:3000"
     judge0_base_url: str = ""
     judge0_api_token: str = ""
-    pydantic_ai_model: str = ""
-    llm_api_key: str = ""
+    interview_model: str = ""
+    report_model: str = ""
     data_dir: Path = ROOT_DIR / "data" / "problems"
     max_interview_turns: int = 4
 

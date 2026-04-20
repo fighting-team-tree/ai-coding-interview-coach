@@ -85,7 +85,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
         fallback_question: str,
     ) -> str:
         settings = get_settings()
-        if Agent is None or not settings.pydantic_ai_model:
+        if Agent is None or not settings.interview_model:
             return fallback_question
 
         system_prompt, user_prompt = self._build_question_prompt(
@@ -97,7 +97,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
 
         try:
             agent = Agent(
-                settings.pydantic_ai_model,
+                settings.interview_model,
                 output_type=QuestionDraft,
                 system_prompt=system_prompt,
             )
@@ -114,14 +114,14 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
     ) -> FeedbackReport:
         fallback = build_fallback_report(problem=problem, session=session)
         settings = get_settings()
-        if Agent is None or not settings.pydantic_ai_model:
+        if Agent is None or not settings.report_model:
             return fallback
 
         system_prompt, user_prompt = self._build_report_prompt(problem=problem, session=session)
 
         try:
             agent = Agent(
-                settings.pydantic_ai_model,
+                settings.report_model,
                 output_type=ReportDraft,
                 system_prompt=system_prompt,
             )
