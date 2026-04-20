@@ -1,0 +1,42 @@
+{
+  "id": "bfs-grid",
+  "title": "격자 최단 탈출",
+  "pattern": "BFS",
+  "difficulty": "medium",
+  "elevator_pitch": "격자에서 시작점부터 출구까지의 최단 이동 횟수를 구하는 문제",
+  "prompt": "0과 1로 구성된 격자가 주어진다. 0은 벽, 1은 이동 가능한 칸이다. 좌상단에서 우하단까지 이동할 수 있는 최소 칸 수를 반환하라. 불가능하면 -1을 반환한다.",
+  "constraints": [
+    "1 <= rows, cols <= 200",
+    "상하좌우로만 이동 가능"
+  ],
+  "examples": [
+    {
+      "input": "grid = [[1,1,0],[0,1,1],[0,1,1]]",
+      "output": "5",
+      "explanation": "BFS 레벨 순회로 최단 거리를 보장한다."
+    }
+  ],
+  "starter_code": "from collections import deque\n\n\ndef shortest_escape(grid: list[list[int]]) -> int:\n    # TODO: implement\n    return -1\n",
+  "expected_complexity": "O(R*C) time, O(R*C) space",
+  "optimal_solution": "Use BFS with a queue and visited marking to guarantee the first arrival is the shortest path.",
+  "follow_up_goals": [
+    "왜 DFS가 아니라 BFS가 최단 거리 보장에 적합한지 말한다.",
+    "visited 처리를 언제 해야 중복 방문이 줄어드는지 설명한다."
+  ],
+  "forbidden_boundaries": [
+    "정답 경로를 직접 낭독하지 않는다."
+  ],
+  "traps": [
+    {
+      "signal": "DFS 사용",
+      "hint": "최단 거리 보장이 필요한 문제에서 DFS를 쓰면 어떤 반례가 생길까요?",
+      "interview_focus": "탐색 전략 선택 근거"
+    },
+    {
+      "signal": "visited 지연 처리",
+      "hint": "큐에서 꺼낼 때 방문 처리하면 같은 칸이 여러 번 들어갈 수 있습니다. 어디서 마킹하는 게 좋을까요?",
+      "interview_focus": "중복 방문과 메모리 사용량"
+    }
+  ]
+}
+

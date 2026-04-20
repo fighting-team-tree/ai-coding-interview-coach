@@ -1,0 +1,44 @@
+{
+  "id": "two-pointer-window",
+  "title": "연속 부분 수열의 최소 길이",
+  "pattern": "Two Pointer",
+  "difficulty": "medium",
+  "elevator_pitch": "양끝 포인터를 움직이며 조건을 만족하는 최소 구간 길이를 찾는 문제",
+  "prompt": "양의 정수 배열 nums 와 양의 정수 target 이 주어진다. 합이 target 이상이 되는 연속 부분 수열 중 길이의 최솟값을 반환하라. 만들 수 없으면 0을 반환한다.",
+  "constraints": [
+    "1 <= nums.length <= 100000",
+    "1 <= nums[i] <= 10000",
+    "1 <= target <= 1000000000"
+  ],
+  "examples": [
+    {
+      "input": "target = 7, nums = [2,3,1,2,4,3]",
+      "output": "2",
+      "explanation": "[4,3]의 길이가 최소다."
+    }
+  ],
+  "starter_code": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    # TODO: implement\n    return 0\n",
+  "expected_complexity": "O(N) time, O(1) extra space",
+  "optimal_solution": "Maintain a sliding window and shrink from the left whenever the running sum reaches the target.",
+  "follow_up_goals": [
+    "왜 brute force O(N^2) 대신 슬라이딩 윈도우가 가능한지 설명한다.",
+    "왼쪽 포인터를 당겨도 되는 조건을 명확히 말한다."
+  ],
+  "forbidden_boundaries": [
+    "정답 코드를 직접 제공하지 않는다.",
+    "문제 외의 DB, 네트워크, 시스템 설계 질문으로 확장하지 않는다."
+  ],
+  "traps": [
+    {
+      "signal": "중첩 반복문 또는 모든 구간 합 탐색",
+      "hint": "현재 구현이 모든 시작점마다 끝점을 다시 탐색한다면 입력이 10만일 때 어떤 일이 벌어질까요?",
+      "interview_focus": "시간복잡도와 포인터 이동 조건"
+    },
+    {
+      "signal": "합 조건 만족 후에도 왼쪽 포인터를 줄이지 않음",
+      "hint": "조건을 이미 만족한 뒤에도 창을 더 줄일 수 있다면, 어떤 불변식을 유지해야 하나요?",
+      "interview_focus": "최소 길이 갱신 타이밍"
+    }
+  ]
+}
+

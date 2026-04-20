@@ -1,0 +1,85 @@
+from __future__ import annotations
+
+import ast
+
+from app.models import AstProfile
+
+
+RISKY_CALLS = {
+    "pop": "list.pop(0) can introduce O(N) shifting costs",
+    "sorted": "sorted() may hide an extra O(N log N) operation",
+}
+
+
+class _Analyzer(ast.NodeVisitor):
+    def __init__(self) -> None:
+        self.loop_depth = 0
+        self.max_loop_depth = 0
+        self.risky_ops: set[str] = set()
+        self.function_stack: list[str] = []
+        self.recursion_detected = False
+        self.branch_points = 1
+
+    def visit_For(self, node: ast.For) -> None:  # noqa: N802
+        self.loop_depth += 1
+        self.max_loop_depth = max(self.max_loop_depth, self.loop_depth)
+        self.branch_points += 1
+        self.generic_visit(node)
+        self.loop_depth -= 1
+
+    def visit_While(self, node: ast.While) -> None:  # noqa: N802
+        self.loop_depth += 1
+        self.max_loop_depth = max(self.max_loop_depth, self.loop_depth)
+        self.branch_points += 1
+        self.generic_visit(node)
+        self.loop_depth -= 1
+
+    def visit_If(self, node: ast.If) -> None:  # noqa: N802
+        self.branch_points += 1
+        self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:  # noqa: N802
+        self.function_stack.append(node.name)
+        self.generic_visit(node)
+        self.function_stack.pop()
+
+    def visit_Call(self, node: ast.Call) -> None:  # noqa: N802
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "pop":
+            if node.args and isinstance(node.args[0], ast.Constant) and node.args[0].value == 0:
+                self.risky_ops.add(RISKY_CALLS["pop"])
+        if isinstance(node.func, ast.Name) and node.func.id == "sorted":
+            self.risky_ops.add(RISKY_CALLS["sorted"])
+        if isinstance(node.func, ast.Name) and self.function_stack and node.func.id == self.function_stack[-1]:
+            self.recursion_detected = True
+        self.generic_visit(node)
+
+
+def analyze_code(code: str) -> AstProfile:
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as exc:
+        return AstProfile(
+            parse_ok=False,
+            notes=[f"Syntax error near line {exc.lineno}: {exc.msg}"],
+        )
+
+    analyzer = _Analyzer()
+    analyzer.visit(tree)
+
+    notes: list[str] = []
+    if analyzer.max_loop_depth >= 2:
+        notes.append("Nested loops detected; complexity discussion should be triggered.")
+    if analyzer.recursion_detected:
+        notes.append("Recursion detected; base-case reasoning should be checked.")
+    if analyzer.risky_ops:
+        notes.append("Potentially expensive operations found in the submitted code.")
+
+    return AstProfile(
+        parse_ok=True,
+        nested_loop_depth=analyzer.max_loop_depth,
+        has_risky_ops=sorted(analyzer.risky_ops),
+        recursion_detected=analyzer.recursion_detected,
+        cyclomatic_complexity=analyzer.branch_points,
+        notes=notes,
+    )
+

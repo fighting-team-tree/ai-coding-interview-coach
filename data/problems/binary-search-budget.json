@@ -1,0 +1,42 @@
+{
+  "id": "binary-search-budget",
+  "title": "예산 상한선 찾기",
+  "pattern": "Binary Search",
+  "difficulty": "medium",
+  "elevator_pitch": "정답 범위 위에서 조건을 판별하며 최대 가능한 값을 찾는 문제",
+  "prompt": "요청 예산 배열 requests 와 총 예산 total 이 주어진다. 각 요청이 상한선 cap 을 넘으면 cap 으로 잘라 합산할 때, 총합이 total 이하가 되도록 하는 최대 cap 을 반환하라.",
+  "constraints": [
+    "1 <= requests.length <= 100000",
+    "1 <= requests[i] <= 100000"
+  ],
+  "examples": [
+    {
+      "input": "requests = [120, 110, 140, 150], total = 485",
+      "output": "127",
+      "explanation": "cap=127 일 때 합이 484로 조건을 만족하는 최대값이다."
+    }
+  ],
+  "starter_code": "def max_budget_cap(requests: list[int], total: int) -> int:\n    # TODO: implement\n    return 0\n",
+  "expected_complexity": "O(N log M) where M is the max request",
+  "optimal_solution": "Binary search the cap and use a monotonic feasibility check on the capped sum.",
+  "follow_up_goals": [
+    "왜 정렬 없이도 cap 범위에서 이분 탐색이 가능한지 설명한다.",
+    "판별 함수의 단조성을 말한다."
+  ],
+  "forbidden_boundaries": [
+    "정확한 cap 값을 바로 알려주지 않는다."
+  ],
+  "traps": [
+    {
+      "signal": "모든 cap 후보 선형 탐색",
+      "hint": "최대 요청값까지 하나씩 cap을 올려보면 입력이 커질 때 어떤 비용이 생길까요?",
+      "interview_focus": "탐색 공간 축소"
+    },
+    {
+      "signal": "판별 함수 단조성 설명 부족",
+      "hint": "cap을 키울수록 총합이 어떤 방향으로만 움직이기 때문에 binary search가 가능한가요?",
+      "interview_focus": "이분 탐색 정당화"
+    }
+  ]
+}
+

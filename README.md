@@ -1,0 +1,56 @@
+# AI_CHAMPION MVP Scaffold
+
+This repository now includes a runnable MVP scaffold for the coding-test-to-interview bridge:
+
+- `apps/web`: Next.js frontend for problem selection, code submission, interview chat, and report review
+- `apps/api`: FastAPI backend with problem loading, AST analysis, Judge0 integration hooks, and a Pydantic AI-driven interview engine
+- `data/problems`: curated problem and trap data used to ground the interview flows
+- `docs/demo_script.md`: a deterministic recording plan for the demo video
+
+## Recommended local setup
+
+### 1. Backend
+
+```bash
+cd apps/api
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e .
+copy .env.example .env
+uvicorn app.main:app --reload --port 8000
+```
+
+### 2. Frontend
+
+```bash
+cd apps/web
+npm install
+copy .env.example .env.local
+npm run dev
+```
+
+Frontend defaults to `http://localhost:8000` for the API.
+
+## Deploy notes
+
+- Frontend is configured as a static Next.js export so it can be deployed to Firebase Hosting free tier.
+- Backend remains a standalone Python service and should be deployed outside Firebase.
+- Firebase config lives at the repository root in `firebase.json`.
+
+## Key environment variables
+
+Backend:
+
+- `APP_ENV`
+- `APP_HOST`
+- `APP_PORT`
+- `FRONTEND_ORIGIN`
+- `JUDGE0_BASE_URL`
+- `JUDGE0_API_TOKEN`
+- `PYDANTIC_AI_MODEL`
+- `LLM_API_KEY`
+
+Frontend:
+
+- `NEXT_PUBLIC_API_BASE_URL`
+

@@ -1,0 +1,17 @@
+.next/
+.vercel/
+node_modules/
+dist/
+out/
+.firebase/
+.env
+.env.local
+.env.*.local
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+*.sqlite3
+apps/api/.env
+apps/web/.env.local
+

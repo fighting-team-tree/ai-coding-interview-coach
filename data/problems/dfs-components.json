@@ -1,0 +1,42 @@
+{
+  "id": "dfs-components",
+  "title": "네트워크 개수 세기",
+  "pattern": "DFS",
+  "difficulty": "easy",
+  "elevator_pitch": "인접 리스트 그래프에서 연결 요소 개수를 세는 문제",
+  "prompt": "정점 수 n과 무방향 간선 목록 edges가 주어진다. 그래프의 연결 요소 개수를 반환하라.",
+  "constraints": [
+    "1 <= n <= 100000",
+    "0 <= edges.length <= 200000"
+  ],
+  "examples": [
+    {
+      "input": "n = 5, edges = [[0,1],[1,2],[3,4]]",
+      "output": "2",
+      "explanation": "{0,1,2}와 {3,4} 두 개의 연결 요소가 있다."
+    }
+  ],
+  "starter_code": "def count_components(n: int, edges: list[list[int]]) -> int:\n    # TODO: implement\n    return 0\n",
+  "expected_complexity": "O(V + E) time, O(V + E) space",
+  "optimal_solution": "Build an adjacency list and traverse each unvisited node once with DFS or BFS.",
+  "follow_up_goals": [
+    "인접 리스트를 쓰는 이유를 설명한다.",
+    "재귀 DFS와 반복 DFS의 trade-off를 말한다."
+  ],
+  "forbidden_boundaries": [
+    "Union-Find 정답 템플릿을 그대로 제시하지 않는다."
+  ],
+  "traps": [
+    {
+      "signal": "방문 배열 없이 DFS",
+      "hint": "무방향 그래프에서 방문 표시가 없으면 어떤 문제가 생길까요?",
+      "interview_focus": "무한 순회 방지"
+    },
+    {
+      "signal": "모든 간선을 매 방문마다 선형 탐색",
+      "hint": "인접 리스트를 만들지 않고 매번 edges를 훑으면 전체 복잡도는 어떻게 달라질까요?",
+      "interview_focus": "자료구조 선택과 복잡도"
+    }
+  ]
+}
+
