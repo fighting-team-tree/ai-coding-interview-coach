@@ -75,4 +75,7 @@ tmp/
 .turbo/
 .pnpm-store/
 *.tsbuildinfo
+
+# Local Playwright inspection artifacts
 .playwright-mcp/
+.playwright-mcp/img/
