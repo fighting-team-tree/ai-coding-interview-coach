@@ -6,7 +6,7 @@ from app.session_store import session_store
 router = APIRouter(prefix="/reports", tags=["reports"])
 
 
-@router.get("/{session_id}", response_model=ReportResponse)
+@router.get("/{session_id}", response_model=ReportResponse, deprecated=True)
 async def read_report(session_id: str) -> ReportResponse:
     try:
         session = session_store.get(session_id)

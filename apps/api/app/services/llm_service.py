@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 
 from pydantic import BaseModel
@@ -11,6 +12,8 @@ try:
     from pydantic_ai import Agent
 except Exception:  # pragma: no cover - optional import
     Agent = None  # type: ignore[assignment]
+
+logger = logging.getLogger(__name__)
 
 
 class QuestionDraft(BaseModel):
@@ -104,6 +107,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
             result = await agent.run(user_prompt)
             return result.output.question.strip()
         except Exception:
+            logger.exception("Falling back to deterministic interview question generation")
             return fallback_question
 
     async def generate_report(
@@ -136,6 +140,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
                 recommended_drills=draft.recommended_drills,
             )
         except Exception:
+            logger.exception("Falling back to heuristic report generation")
             return fallback
 
 
@@ -153,8 +158,8 @@ def build_fallback_report(*, problem: Problem, session: InterviewSession) -> Fee
     return FeedbackReport(
         session_id=session.id,
         summary=(
-            "The candidate kept the conversation moving and showed awareness "
-            "of the intended algorithmic direction. "
+            "Fallback report generated from transcript heuristics because model-based "
+            "evaluation was unavailable. "
             "Further depth is needed on complexity trade-offs and implementation rationale."
         ),
         logical_structure=FeedbackAxis(
