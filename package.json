@@ -5,8 +5,9 @@
     "apps/web"
   ],
   "scripts": {
+    "setup:api": "cd apps/api && uv sync",
+    "dev:api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build"
   }
 }
-

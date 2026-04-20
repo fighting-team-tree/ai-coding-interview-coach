@@ -13,11 +13,16 @@ This repository now includes a runnable MVP scaffold for the coding-test-to-inte
 
 ```bash
 cd apps/api
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e .
+uv sync
 copy .env.example .env
-uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+From the repository root you can also use:
+
+```bash
+npm run setup:api
+npm run dev:api
 ```
 
 ### 2. Frontend
@@ -53,4 +58,3 @@ Backend:
 Frontend:
 
 - `NEXT_PUBLIC_API_BASE_URL`
-
