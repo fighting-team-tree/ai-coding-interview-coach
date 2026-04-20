@@ -75,3 +75,4 @@ tmp/
 .turbo/
 .pnpm-store/
 *.tsbuildinfo
+.playwright-mcp/

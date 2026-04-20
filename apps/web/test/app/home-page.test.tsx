@@ -15,14 +15,16 @@ vi.mock("next/link", () => ({
 }));
 
 describe("HomePage", () => {
-  it("renders the demo heading and a card for every problem", () => {
+  it("renders the new demo framing and a card for every problem", () => {
     render(<HomePage />);
 
     expect(
       screen.getByRole("heading", {
-        name: "코딩 테스트 직후, 바로 기술 면접으로 넘어가는 데모",
+        name: "코딩 테스트 직후, AI가 내 코드의 약점을 근거로 압박 면접을 만든다",
       }),
     ).toBeInTheDocument();
+
+    expect(screen.getByText("Controlled Interview AI")).toBeInTheDocument();
 
     const links = screen.getAllByRole("link");
     expect(links).toHaveLength(problemCatalog.length);

@@ -12,6 +12,10 @@ export type ProblemDetail = ProblemSummary & {
   examples: Array<{ input: string; output: string; explanation: string }>;
   starter_code: string;
   expected_complexity: string;
+  optimal_solution: string;
+  follow_up_goals: string[];
+  forbidden_boundaries: string[];
+  traps: Array<{ signal: string; hint: string; interview_focus: string }>;
 };
 
 export type SessionStatus = "created" | "submitted" | "interviewing" | "evaluating" | "completed";
@@ -103,4 +107,3 @@ export function finalizeSession(sessionId: string): Promise<{ report: FeedbackRe
     body: JSON.stringify({})
   });
 }
-

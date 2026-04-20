@@ -1,8 +1,42 @@
 export const problemCatalog = [
-  { id: "two-pointer-window", title: "연속 부분 수열의 최소 길이", pattern: "Two Pointer" },
-  { id: "bfs-grid", title: "격자 최단 탈출", pattern: "BFS" },
-  { id: "dfs-components", title: "네트워크 개수 세기", pattern: "DFS" },
-  { id: "dp-stairs", title: "계단 오르기 경우의 수", pattern: "Dynamic Programming" },
-  { id: "binary-search-budget", title: "예산 상한선 찾기", pattern: "Binary Search" }
+  {
+    id: "two-pointer-window",
+    title: "연속 부분 수열의 최소 길이",
+    pattern: "Two Pointer",
+    difficulty: "medium",
+    elevatorPitch: "중첩 반복문 풀이를 sliding window reasoning으로 전환시키는 대표 데모",
+    demoFocus: "AST가 중첩 루프를 감지하고 complexity 꼬리질문을 여는 시나리오",
+  },
+  {
+    id: "bfs-grid",
+    title: "격자 최단 탈출",
+    pattern: "BFS",
+    difficulty: "medium",
+    elevatorPitch: "탐색 순서와 방문 처리의 근거를 끝까지 방어해야 하는 그래프 문제",
+    demoFocus: "queue 사용과 shortest-path invariant를 어떻게 설명하는지 검증",
+  },
+  {
+    id: "dfs-components",
+    title: "네트워크 개수 세기",
+    pattern: "DFS",
+    difficulty: "easy",
+    elevatorPitch: "기본 정답은 맞지만 recursion/visited 설명의 구멍을 잡아내기 좋은 문제",
+    demoFocus: "좋은 풀이 제출 시 Plan B로 scale-up 질문을 던지는 시나리오",
+  },
+  {
+    id: "dp-stairs",
+    title: "계단 오르기 경우의 수",
+    pattern: "Dynamic Programming",
+    difficulty: "easy",
+    elevatorPitch: "점화식 설명과 space optimization trade-off를 드러내기 좋은 DP 예시",
+    demoFocus: "점화식 근거와 상태 정의를 말로 풀어내는 능력을 검증",
+  },
+  {
+    id: "binary-search-budget",
+    title: "예산 상한선 찾기",
+    pattern: "Binary Search",
+    difficulty: "hard",
+    elevatorPitch: "탐색 범위 설정과 판정 함수의 monotonicity를 설명해야 하는 문제",
+    demoFocus: "정답은 맞았어도 reasoning이 약하면 압박 질문으로 깊이를 늘리는 시나리오",
+  },
 ] as const;
-
