@@ -18,7 +18,14 @@ from app.services.problem_loader import get_problem
 from app.session_store import session_store
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
-judge_client = Judge0Client()
+judge_client: Judge0Client | None = None
+
+
+def get_judge_client() -> Judge0Client:
+    global judge_client
+    if judge_client is None:
+        judge_client = Judge0Client()
+    return judge_client
 
 
 @router.post("", response_model=SessionResponse)
@@ -44,7 +51,7 @@ async def submit_code(session_id: str, payload: SubmitCodeRequest) -> SubmitCode
     session.code = payload.code
     session.status = SessionStatus.submitted
     session.ast_profile = analyze_code(payload.code)
-    session.judge_result = await judge_client.execute_python(payload.code)
+    session.judge_result = await get_judge_client().execute_python(payload.code)
 
     opening_question = await interview_engine.start_interview(problem=problem, session=session)
     session_store.save(session)

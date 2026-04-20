@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import sys
-import tempfile
 from pathlib import Path
 
 
@@ -44,8 +44,9 @@ def test_missing_requirements_accept_verify_scripts() -> None:
 
 def test_read_successful_commands_filters_to_current_turn() -> None:
     session_id = "019dabf1-cd48-73e0-905f-fc65752a9f23"
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        codex_home = Path(tmp_dir) / ".codex"
+    codex_home = ROOT_DIR / "tmp-test-artifacts" / "codex-hooks" / session_id
+    shutil.rmtree(codex_home, ignore_errors=True)
+    try:
         rollout_dir = codex_home / "sessions" / "2026" / "04" / "21"
         rollout_dir.mkdir(parents=True)
         rollout_path = rollout_dir / f"rollout-2026-04-21T02-30-43-{session_id}.jsonl"
@@ -84,6 +85,8 @@ def test_read_successful_commands_filters_to_current_turn() -> None:
         )
 
         assert commands == ["npm run verify:api"]
+    finally:
+        shutil.rmtree(codex_home, ignore_errors=True)
 
 
 def test_render_hooks_unix_prefers_python3() -> None:

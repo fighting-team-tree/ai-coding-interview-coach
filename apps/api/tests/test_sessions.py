@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 from fastapi.testclient import TestClient
 
 from app.models import FeedbackAxis, FeedbackReport, JudgeResult, SessionStatus
@@ -46,7 +48,12 @@ async def _fake_finalize(*, problem, session) -> None:
 
 
 def test_session_endpoints_cover_submission_flow(client: TestClient, monkeypatch) -> None:
-    monkeypatch.setattr(sessions_router.judge_client, "execute_python", _fake_execute_python)
+    monkeypatch.setattr(sessions_router, "get_judge_client", lambda: sessions_router.judge_client)
+    monkeypatch.setattr(
+        sessions_router,
+        "judge_client",
+        SimpleNamespace(execute_python=_fake_execute_python),
+    )
     monkeypatch.setattr(sessions_router.interview_engine, "start_interview", _fake_start_interview)
     monkeypatch.setattr(sessions_router.interview_engine, "handle_turn", _fake_handle_turn)
     monkeypatch.setattr(sessions_router.interview_engine, "finalize", _fake_finalize)

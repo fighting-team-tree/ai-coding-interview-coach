@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     judge0_api_token: str = ""
     interview_model: str = ""
     report_model: str = ""
+    openai_api_key: str = ""
+    anthropic_api_key: str = ""
+    google_api_key: str = ""
     data_dir: Path = ROOT_DIR / "data" / "problems"
     max_interview_turns: int = 4
 
