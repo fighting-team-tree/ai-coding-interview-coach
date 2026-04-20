@@ -1,0 +1,36 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Install API dependencies
+        run: uv sync --project apps/api --dev
+
+      - name: Verify web
+        run: npm run verify:web
+
+      - name: Verify API
+        run: npm run verify:api

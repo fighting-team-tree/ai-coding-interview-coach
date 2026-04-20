@@ -4,7 +4,6 @@ import ast
 
 from app.models import AstProfile
 
-
 RISKY_CALLS = {
     "pop": "list.pop(0) can introduce O(N) shifting costs",
     "sorted": "sorted() may hide an extra O(N log N) operation",
@@ -49,7 +48,11 @@ class _Analyzer(ast.NodeVisitor):
                 self.risky_ops.add(RISKY_CALLS["pop"])
         if isinstance(node.func, ast.Name) and node.func.id == "sorted":
             self.risky_ops.add(RISKY_CALLS["sorted"])
-        if isinstance(node.func, ast.Name) and self.function_stack and node.func.id == self.function_stack[-1]:
+        if (
+            isinstance(node.func, ast.Name)
+            and self.function_stack
+            and node.func.id == self.function_stack[-1]
+        ):
             self.recursion_detected = True
         self.generic_visit(node)
 
@@ -82,4 +85,3 @@ def analyze_code(code: str) -> AstProfile:
         cyclomatic_complexity=analyzer.branch_points,
         notes=notes,
     )
-

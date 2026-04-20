@@ -34,6 +34,9 @@ Read these when the task touches proposal or planning documents:
 - Treat the journey from coding test submission to interview practice as the top-level user flow.
 - Proposal and planning output must align with `docs/proposal_template.md`.
 - Preserve original files under `docs/ai-champion-hwp/`. Edit derived Markdown or top-level planning docs first.
+- For code changes under `apps/web`, run `npm run verify:web` before treating the task as complete.
+- For code changes under `apps/api`, run `npm run verify:api` before treating the task as complete.
+- For cross-stack changes, run both or the root `npm run verify`.
 
 ## Approval Policy
 

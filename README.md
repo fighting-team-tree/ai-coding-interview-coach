@@ -13,7 +13,7 @@ This repository now includes a runnable MVP scaffold for the coding-test-to-inte
 
 ```bash
 cd apps/api
-uv sync
+uv sync --dev
 copy .env.example .env
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -35,6 +35,37 @@ npm run dev
 ```
 
 Frontend defaults to `http://localhost:8000` for the API.
+
+## Verification commands
+
+Run the stack-specific verification commands before finishing code changes:
+
+```bash
+npm run verify:web
+npm run verify:api
+```
+
+Or run both from the repository root:
+
+```bash
+npm run verify
+```
+
+`verify:web` runs ESLint, TypeScript, Vitest, and a production build.
+`verify:api` runs Ruff, Python bytecode compilation, and pytest.
+
+## Codex hook enforcement
+
+This repository now ships project-level Codex hook config in `.codex/`.
+
+- `.codex/config.toml` enables `codex_hooks`
+- `.codex/hooks.json` injects the verification policy at session start
+- the `Stop` hook checks whether the relevant verification commands succeeded before the task ends
+
+Important limitation:
+
+- OpenAI Codex hooks are currently disabled on native Windows. To get actual hook enforcement, run Codex from WSL/Linux against this same repository.
+- Windows users still get the same verification commands and the Linux CI workflow in `.github/workflows/verify.yml`.
 
 ## Deploy notes
 

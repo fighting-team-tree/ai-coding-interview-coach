@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from pydantic import BaseModel
 
 from app.config import get_settings
-from app.models import AstProfile, FeedbackAxis, FeedbackReport, FlowType, InterviewSession, Problem
+from app.models import AstProfile, FeedbackAxis, FeedbackReport, InterviewSession, Problem
 
 try:
     from pydantic_ai import Agent
@@ -63,7 +62,8 @@ Prior turns: {[turn.model_dump() for turn in session.turns[-4:]]}
     ) -> tuple[str, str]:
         system_prompt = (
             "You evaluate interview explanations for algorithm problems. "
-            "Return actionable feedback across logical structure, technical accuracy, and explanation clarity."
+            "Return actionable feedback across logical structure, "
+            "technical accuracy, and explanation clarity."
         )
         user_prompt = f"""
 Problem: {problem.title}
@@ -145,34 +145,57 @@ def build_fallback_report(*, problem: Problem, session: InterviewSession) -> Fee
     risky_ops = len(session.ast_profile.has_risky_ops) if session.ast_profile else 0
 
     logic_score = 6 if answer_length >= 60 else 4
-    technical_score = 7 if risky_ops == 0 and session.judge_result and session.judge_result.passed else 5
+    technical_score = (
+        7 if risky_ops == 0 and session.judge_result and session.judge_result.passed else 5
+    )
     clarity_score = 6 if len(answers) >= 2 else 4
 
     return FeedbackReport(
         session_id=session.id,
         summary=(
-            "The candidate kept the conversation moving and showed awareness of the intended algorithmic direction. "
+            "The candidate kept the conversation moving and showed awareness "
+            "of the intended algorithmic direction. "
             "Further depth is needed on complexity trade-offs and implementation rationale."
         ),
         logical_structure=FeedbackAxis(
             score=logic_score,
-            rationale="The explanation covered the broad approach but could connect assumptions to consequences more explicitly.",
-            next_step="Practice answering in a fixed structure: approach, complexity, edge cases, and trade-off.",
+            rationale=(
+                "The explanation covered the broad approach but could connect "
+                "assumptions to consequences more explicitly."
+            ),
+            next_step=(
+                "Practice answering in a fixed structure: approach, "
+                "complexity, edge cases, and trade-off."
+            ),
         ),
         technical_accuracy=FeedbackAxis(
             score=technical_score,
-            rationale="The candidate stayed close to the expected solution path, with some room to sharpen complexity language.",
-            next_step="Rehearse why the chosen data structure avoids the suboptimal operations flagged by the AST profile.",
+            rationale=(
+                "The candidate stayed close to the expected solution path, "
+                "with some room to sharpen complexity language."
+            ),
+            next_step=(
+                "Rehearse why the chosen data structure avoids the suboptimal "
+                "operations flagged by the AST profile."
+            ),
         ),
         explanation_clarity=FeedbackAxis(
             score=clarity_score,
-            rationale="The response was understandable, but key terms could be stated more directly and earlier.",
-            next_step="Use shorter sentences and say the complexity target before discussing implementation details.",
+            rationale=(
+                "The response was understandable, but key terms could be stated "
+                "more directly and earlier."
+            ),
+            next_step=(
+                "Use shorter sentences and say the complexity target before "
+                "discussing implementation details."
+            ),
         ),
         recommended_drills=[
             f"Re-explain {problem.pattern} solutions in under 60 seconds.",
-            "Answer one follow-up question on edge cases and one on space complexity after each coding practice session.",
+            (
+                "Answer one follow-up question on edge cases and one on space "
+                "complexity after each coding practice session."
+            ),
             "Compare the submitted approach against a brute-force baseline out loud.",
         ],
     )
-

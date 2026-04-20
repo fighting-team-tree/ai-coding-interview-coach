@@ -7,7 +7,6 @@ import httpx
 from app.config import get_settings
 from app.models import JudgeResult
 
-
 PYTHON_LANGUAGE_ID = 71
 
 
@@ -60,7 +59,9 @@ class Judge0Client:
                         stdout=payload.get("stdout") or "",
                         stderr=payload.get("stderr") or "",
                         compile_output=payload.get("compile_output") or "",
-                        execution_time_ms=int(float(payload["time"]) * 1000) if payload.get("time") else None,
+                        execution_time_ms=int(float(payload["time"]) * 1000)
+                        if payload.get("time")
+                        else None,
                         memory_kb=payload.get("memory"),
                         mode="judge0",
                     )
@@ -71,4 +72,3 @@ class Judge0Client:
             stderr="Judge0 did not return a terminal state within the polling window.",
             mode="judge0",
         )
-

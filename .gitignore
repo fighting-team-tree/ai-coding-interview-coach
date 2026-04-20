@@ -9,9 +9,11 @@ out/
 .env.*.local
 __pycache__/
 .pytest_cache/
+.pytest-tmp-api/
 .venv/
 *.pyc
 *.sqlite3
+pytest-cache-files-*/
 apps/api/.env
 apps/web/.env.local
 
@@ -62,6 +64,7 @@ htmlcov/
 .tox/
 .eggs/
 *.egg-info/
+.uv-cache/
 
 # Local databases and temp directories
 *.db
@@ -71,3 +74,4 @@ tmp/
 # Node and frontend caches
 .turbo/
 .pnpm-store/
+*.tsbuildinfo

@@ -148,4 +148,3 @@ class TurnResponse(BaseModel):
 
 class ReportResponse(BaseModel):
     report: FeedbackReport
-

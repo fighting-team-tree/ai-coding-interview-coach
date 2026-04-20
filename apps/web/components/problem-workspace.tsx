@@ -65,6 +65,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     () => session?.turns.filter((turn) => turn.role === "assistant").length ?? 0,
     [session]
   );
+  const reportAxes = report
+    ? [
+        { label: "Logical Structure", axis: report.logical_structure },
+        { label: "Technical Accuracy", axis: report.technical_accuracy },
+        { label: "Explanation Clarity", axis: report.explanation_clarity },
+      ]
+    : [];
 
   async function handleSubmitCode() {
     if (!session) {
@@ -199,11 +206,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <h2>3-Axis Feedback Report</h2>
           <p>{report.summary}</p>
           <div className="report-grid">
-            {[
-              ["Logical Structure", report.logical_structure],
-              ["Technical Accuracy", report.technical_accuracy],
-              ["Explanation Clarity", report.explanation_clarity]
-            ].map(([label, axis]) => (
+            {reportAxes.map(({ label, axis }) => (
               <article key={label} className="report-card">
                 <div className="score">{axis.score}/10</div>
                 <h3>{label}</h3>

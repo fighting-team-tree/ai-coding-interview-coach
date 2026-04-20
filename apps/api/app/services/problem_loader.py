@@ -32,4 +32,3 @@ def get_problem(problem_id: str) -> Problem:
         return _load_problem_index()[problem_id]
     except KeyError as exc:
         raise KeyError(f"Unknown problem: {problem_id}") from exc
-

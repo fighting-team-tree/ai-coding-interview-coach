@@ -5,9 +5,12 @@
     "apps/web"
   ],
   "scripts": {
-    "setup:api": "cd apps/api && uv sync",
+    "setup:api": "cd apps/api && uv sync --dev --cache-dir ../../.uv-cache",
     "dev:api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
     "dev:web": "npm --workspace apps/web run dev",
-    "build:web": "npm --workspace apps/web run build"
+    "build:web": "npm --workspace apps/web run build",
+    "verify:web": "npm --workspace apps/web run verify",
+    "verify:api": "cd apps/api && uv run --cache-dir ../../.uv-cache ruff check app tests && uv run --cache-dir ../../.uv-cache python -m compileall app tests && uv run --cache-dir ../../.uv-cache pytest -q -p no:cacheprovider --basetemp ../../.pytest-tmp-api",
+    "verify": "npm run verify:web && npm run verify:api"
   }
 }
