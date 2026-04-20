@@ -53,20 +53,73 @@ export type FeedbackReport = {
   recommended_drills: string[];
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+type RuntimeLocation = Pick<Location, "hostname" | "origin">;
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly body: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+function normalizeApiBaseUrl(baseUrl: string): string {
+  return baseUrl.replace(/\/+$/, "");
+}
+
+function extractErrorMessage(status: number, body: string): string {
+  if (!body) {
+    return `Request failed: ${status}`;
+  }
+
+  try {
+    const parsed = JSON.parse(body) as { detail?: string };
+    return parsed.detail || body;
+  } catch {
+    return body;
+  }
+}
+
+export function resolveApiBaseUrl(runtimeLocation?: RuntimeLocation): string {
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  if (configuredBaseUrl) {
+    return normalizeApiBaseUrl(configuredBaseUrl);
+  }
+
+  const location =
+    runtimeLocation ??
+    (typeof window !== "undefined"
+      ? ({ hostname: window.location.hostname, origin: window.location.origin } satisfies RuntimeLocation)
+      : null);
+
+  if (!location) {
+    return "http://localhost:8000";
+  }
+
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    return "http://localhost:8000";
+  }
+
+  throw new Error(
+    "NEXT_PUBLIC_API_BASE_URL is not configured. Set it to the deployed API origin for non-local environments.",
+  );
+}
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${resolveApiBaseUrl()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      ...(init?.headers ?? {})
-    }
+      ...(init?.headers ?? {}),
+    },
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Request failed: ${response.status}`);
+    const body = await response.text();
+    throw new ApiError(extractErrorMessage(response.status, body), response.status, body);
   }
 
   return (await response.json()) as T;
@@ -104,6 +157,10 @@ export function submitAnswer(sessionId: string, answer: string): Promise<{ sessi
 export function finalizeSession(sessionId: string): Promise<{ report: FeedbackReport }> {
   return fetchJson<{ report: FeedbackReport }>(`/sessions/${sessionId}/finalize`, {
     method: "POST",
-    body: JSON.stringify({})
+    body: JSON.stringify({}),
   });
+}
+
+export function getSessionReport(sessionId: string): Promise<{ report: FeedbackReport }> {
+  return fetchJson<{ report: FeedbackReport }>(`/sessions/${sessionId}/report`);
 }

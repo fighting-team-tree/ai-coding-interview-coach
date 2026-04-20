@@ -400,6 +400,12 @@ strong,
   background: rgba(8, 18, 32, 0.72);
 }
 
+.error-state,
+.report-recovery {
+  display: grid;
+  gap: 14px;
+}
+
 .judge-head {
   display: flex;
   justify-content: space-between;
@@ -641,6 +647,8 @@ strong,
 
   .panel-header,
   .report-header {
+    display: grid;
     grid-template-columns: 1fr;
+    align-items: stretch;
   }
 }

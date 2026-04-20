@@ -4,12 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
 
 import {
+  ApiError,
   FeedbackReport,
   ProblemDetail,
   Session,
   createSession,
   finalizeSession,
   getProblem,
+  getSessionReport,
   submitAnswer,
   submitCode,
 } from "@/lib/api";
@@ -54,7 +56,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const [report, setReport] = useState<FeedbackReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [recoveringReport, setRecoveringReport] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,15 +66,24 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     async function bootstrap() {
       try {
         setLoading(true);
-        const [problemData, sessionData] = await Promise.all([
-          getProblem(problemId),
-          createSession(problemId),
-        ]);
+        setError(null);
+        setProblem(null);
+        setSession(null);
+        setReport(null);
+
+        const problemData = await getProblem(problemId);
         if (cancelled) {
           return;
         }
+
         setProblem(problemData);
         setCode(problemData.starter_code);
+
+        const sessionData = await createSession(problemId);
+        if (cancelled) {
+          return;
+        }
+
         setSession(sessionData.session);
       } catch (err) {
         if (!cancelled) {
@@ -87,7 +100,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     return () => {
       cancelled = true;
     };
-  }, [problemId]);
+  }, [problemId, reloadToken]);
 
   const assistantTurns = useMemo(
     () => session?.turns.filter((turn) => turn.role === "assistant").length ?? 0,
@@ -144,6 +157,41 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     },
   ];
 
+  function retryBootstrap() {
+    setReloadToken((current) => current + 1);
+  }
+
+  async function recoverReport(sessionId: string, preferFinalize = false) {
+    setRecoveringReport(true);
+    setError(null);
+    try {
+      let recoveredReport: FeedbackReport | null = null;
+
+      if (!preferFinalize) {
+        try {
+          const existingReport = await getSessionReport(sessionId);
+          recoveredReport = existingReport.report;
+        } catch (err) {
+          if (!(err instanceof ApiError) || err.status !== 404) {
+            throw err;
+          }
+        }
+      }
+
+      if (!recoveredReport) {
+        const finalized = await finalizeSession(sessionId);
+        recoveredReport = finalized.report;
+      }
+
+      setReport(recoveredReport);
+      setSession((current) => (current ? { ...current, status: "completed" } : current));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Report recovery failed");
+    } finally {
+      setRecoveringReport(false);
+    }
+  }
+
   async function handleSubmitCode() {
     if (!session) {
       return;
@@ -171,15 +219,26 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       setSession(response.session);
       setAnswer("");
       if (response.completed) {
-        const finalized = await finalizeSession(session.id);
-        setReport(finalized.report);
-        setSession((current) => (current ? { ...current, status: "completed" } : current));
+        await recoverReport(response.session.id, true);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Answer submit failed");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (error && (!problem || !session)) {
+    return (
+      <div className="card error-state">
+        <div className="eyebrow">Workspace Error</div>
+        <h1>워크스페이스를 불러오지 못했습니다.</h1>
+        <p className="muted">{error}</p>
+        <button className="primary" onClick={retryBootstrap}>
+          Retry
+        </button>
+      </div>
+    );
   }
 
   if (loading || !problem || !session) {
@@ -340,7 +399,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <button
               className="primary"
               onClick={handleSendAnswer}
-              disabled={submitting || !session.current_question}
+              disabled={submitting || recoveringReport || !session.current_question}
             >
               {submitting ? "Sending..." : "Send Answer"}
             </button>
@@ -425,6 +484,25 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               </ul>
             </div>
           </div>
+        </section>
+      ) : null}
+
+      {!report && session.status === "evaluating" ? (
+        <section className="card report-recovery">
+          <div>
+            <div className="eyebrow">Report Recovery</div>
+            <h2>리포트 생성이 지연되거나 실패했을 수 있습니다.</h2>
+            <p className="muted">
+              이미 생성된 report를 다시 읽거나, finalize 요청을 한 번 더 보내 복구할 수 있습니다.
+            </p>
+          </div>
+          <button
+            className="primary"
+            onClick={() => recoverReport(session.id)}
+            disabled={recoveringReport || submitting}
+          >
+            {recoveringReport ? "Recovering..." : "Recover Report"}
+          </button>
         </section>
       ) : null}
 
