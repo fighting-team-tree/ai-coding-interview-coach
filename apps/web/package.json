@@ -8,7 +8,11 @@
     "lint": "eslint .",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "test": "vitest run",
-    "verify": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "qa:install": "playwright install chromium",
+    "qa:build": "node ./scripts/build-qa.mjs",
+    "qa:serve": "python -m http.server 3100 --directory out",
+    "qa:e2e": "npm run qa:build && playwright test"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
@@ -18,12 +22,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
+    "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
-    "@vitejs/plugin-react": "^4.3.4",
     "@types/node": "^22.8.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.15.0",
     "eslint-config-next": "^15.0.0",
     "jsdom": "^25.0.1",

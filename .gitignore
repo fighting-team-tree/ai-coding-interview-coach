@@ -79,3 +79,5 @@ tmp/
 # Local Playwright inspection artifacts
 .playwright-mcp/
 .playwright-mcp/img/
+apps/web/playwright-report/
+apps/web/test-results/

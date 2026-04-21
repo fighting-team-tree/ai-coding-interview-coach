@@ -11,6 +11,9 @@
     "build:web": "npm --workspace apps/web run build",
     "verify:web": "npm --workspace apps/web run verify",
     "verify:api": "cd apps/api && uv run --cache-dir ../../.uv-cache ruff check app tests && uv run --cache-dir ../../.uv-cache python -m compileall app tests && uv run --cache-dir ../../.uv-cache pytest -q -p no:cacheprovider --basetemp ../../.pytest-tmp-api",
-    "verify": "npm run verify:web && npm run verify:api"
+    "verify": "npm run verify:web && npm run verify:api",
+    "qa:install": "npm --workspace apps/web run qa:install",
+    "qa:e2e": "npm --workspace apps/web run qa:e2e",
+    "qa": "npm run verify && npm run qa:e2e"
   }
 }

@@ -29,8 +29,14 @@ jobs:
       - name: Install API dependencies
         run: uv sync --project apps/api --dev
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Verify web
         run: npm run verify:web
 
       - name: Verify API
         run: npm run verify:api
+
+      - name: Run browser QA
+        run: npm run qa:e2e
