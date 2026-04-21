@@ -143,6 +143,9 @@ def build_session_start_context() -> str:
         "- After changing files under apps/api, run `npm run verify:api` before ending the task.\n"
         "- If both areas changed, run both or the root `npm run verify`.\n"
         "- Docs-only and data-only changes do not require verification.\n"
+        "- For commit work, read `.codex/workflows/commit-policy.md` and default to Korean commit message descriptions.\n"
+        "- Before any commit, inspect status/diff, propose numbered commit options, and wait for explicit user approval.\n"
+        "- Codex Default mode cannot use the Plan mode question tool, so commit approval must use text-based numbered choices.\n"
         "- Project hooks are rendered from `.codex/hooks/settings.toml` into `.codex/hooks.json`.\n"
         "- Windows uses the configured shell policy (`auto` defaults to `pwsh -> powershell -> cmd`)."
     )

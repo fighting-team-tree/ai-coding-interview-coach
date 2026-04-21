@@ -24,6 +24,9 @@ Always read these first for meaningful work:
 - `.codex/context/project.md`
 - `.codex/workflows/execution-policy.md`
 
+Read this whenever the task touches commit preparation or commit execution:
+- `.codex/workflows/commit-policy.md`
+
 Read these when the task touches proposal or planning documents:
 - `.codex/workflows/docs-authoring.md`
 - `.codex/checklists/proposal-review.md`
@@ -47,3 +50,11 @@ For major edits, multi-file changes, structural changes, or any commit:
 4. Execute only after approval.
 
 Do not combine plan briefing and execution in the same turn when the change is substantial.
+
+## Commit Rules
+
+- Codex should default to Korean commit message descriptions unless the user explicitly asks for English.
+- Preferred commit message format is Conventional Commits style: `<type>: 한국어 설명`.
+- Before any commit, inspect `git status` and diff, group changes logically, and present commit options to the user.
+- Commit approval must use a text-based selection step with numbered options because Codex Default mode cannot use the Plan mode question tool.
+- Do not run `git add` or `git commit` until the user explicitly selects an option.

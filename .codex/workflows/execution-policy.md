@@ -41,12 +41,28 @@ Before any commit:
 1. inspect `git status` and the relevant diff
 2. group changes into logical commit units
 3. propose commit messages using Conventional Commit style when possible
-4. wait for explicit approval
-5. only then run `git add` and `git commit`
+4. default to Korean commit message descriptions unless the user asks for English
+5. present explicit commit options and wait for user approval
+6. only then run `git add` and `git commit`
 
 Do not combine commit planning and commit execution in the same turn.
 
-## 6. What Can Be Done Without Separate Approval
+For detailed commit behavior, follow `.codex/workflows/commit-policy.md`.
+
+## 6. Approval Format for Commits
+
+When commit approval is needed, use a compact text-based selection step.
+
+The approval prompt should:
+- present numbered, mutually exclusive options
+- put the recommended option first
+- include the full proposed commit message
+- include the main file set for each option
+
+Do not assume availability of a UI question tool in Default mode.
+Use plain assistant text and wait for the user's explicit selection.
+
+## 7. What Can Be Done Without Separate Approval
 
 The following usually do not need a separate approval turn:
 - reading files
@@ -56,7 +72,7 @@ The following usually do not need a separate approval turn:
 
 If the work crosses into actual edits with notable impact, stop and brief first.
 
-## 7. Editing Priorities in This Repository
+## 8. Editing Priorities in This Repository
 
 When the task is ambiguous, prefer:
 1. clarifying the product story

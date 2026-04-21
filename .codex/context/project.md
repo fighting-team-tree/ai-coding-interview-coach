@@ -71,3 +71,5 @@ Derived Markdown files under `docs/ai-champion-hwp-md/` are safer working surfac
 ## 7. Preferred Language for Output
 
 Unless the user asks otherwise, planning and proposal content for this repository should default to Korean, with technical terms left in English when they are clearer or standard.
+
+For commit messages, Codex should also default to Korean descriptions while keeping Conventional Commit types in English where applicable.
