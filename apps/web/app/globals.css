@@ -99,6 +99,44 @@ strong,
   font-weight: 700;
 }
 
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(9, 19, 29, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.app-header-inner {
+  width: min(1240px, calc(100vw - 32px));
+  margin: 0 auto;
+  height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.app-brand {
+  display: grid;
+  gap: 3px;
+}
+
+.app-brand-eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.app-brand-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f4f8fc;
+  line-height: 1;
+}
+
 .service-home {
   display: grid;
   gap: 20px;
@@ -779,10 +817,9 @@ strong,
 .workspace-main-grid {
   display: grid;
   gap: 20px;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-  grid-template-areas:
-    "code interview"
-    "evidence evidence";
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr) minmax(260px, 0.72fr);
+  grid-template-areas: "code interview evidence";
+  align-items: start;
 }
 
 .workspace-hero {
@@ -843,7 +880,7 @@ strong,
 }
 
 .variant-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin: 18px 0;
 }
 
@@ -876,6 +913,27 @@ strong,
   box-shadow: 0 16px 36px rgba(43, 109, 102, 0.16);
 }
 
+.variant-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.variant-recommended-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(143, 216, 203, 0.32);
+  background: rgba(143, 216, 203, 0.16);
+  color: #e0fbf6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 .variant-card strong {
   font-size: 1.1rem;
 }
@@ -885,12 +943,27 @@ strong,
   line-height: 1.5;
 }
 
+.report-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   align-items: flex-start;
   margin-bottom: 14px;
+}
+
+.panel-header .primary,
+.panel-header .secondary-button,
+.report-actions .primary,
+.report-actions .secondary-button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .primary {
@@ -1037,7 +1110,7 @@ strong,
 .evidence-stack {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .evidence-block {
@@ -1203,6 +1276,10 @@ strong,
     display: grid;
   }
 
+  .workspace-main-grid {
+    grid-template-areas: "code" "interview" "evidence";
+  }
+
   .signal-grid,
   .analysis-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1231,6 +1308,56 @@ strong,
 
   .journey-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.workspace-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40vh;
+}
+
+.workspace-loading-card {
+  display: grid;
+  gap: 14px;
+  max-width: 360px;
+  width: 100%;
+}
+
+.workspace-loading-card h2 {
+  margin: 0;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.22s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.44s;
+}
+
+@keyframes dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "./globals.css";
 import type { Metadata } from "next";
 
@@ -10,7 +11,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="app-shell">{children}</body>
+      <body className="app-shell">
+        <header className="app-header">
+          <div className="app-header-inner">
+            <Link href="/" className="app-brand">
+              <span className="app-brand-eyebrow">Socratic Deep-Dive</span>
+              <strong className="app-brand-name">AI Champion</strong>
+            </Link>
+          </div>
+        </header>
+        {children}
+      </body>
     </html>
   );
 }

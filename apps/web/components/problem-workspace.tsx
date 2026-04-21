@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Editor from "@monaco-editor/react";
 
 import {
@@ -259,28 +260,43 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   }
 
   if (loading || !problem || !session) {
-    return <div className="card">워크스페이스를 준비하는 중입니다...</div>;
+    return (
+      <div className="workspace-loading">
+        <div className="card workspace-loading-card">
+          <div className="eyebrow">불러오는 중</div>
+          <h2>워크스페이스 준비 중</h2>
+          <p className="muted">문제와 세션을 초기화하고 있습니다.</p>
+          <div className="loading-dots">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const proofMeta = [
     {
-      title: "현재 질문 흐름",
+      title: "질문 흐름",
       value: session.branch_decision
         ? FLOW_META[session.branch_decision.flow_type].label
         : "코드 제출 대기",
       description:
         session.branch_decision?.primary_signal ??
-        "코드를 제출하면 코드 신호를 바탕으로 질문 흐름이 정해집니다.",
+        "코드를 제출하면 코드 신호를 분석해 질문 방식이 자동으로 결정됩니다.",
     },
     {
-      title: "질문 생성 상태",
+      title: "AI 면접관",
       value: MODE_LABEL[session.question_mode],
-      description: "현재 질문이 어떤 방식으로 이어지고 있는지 한눈에 보여줍니다.",
+      description:
+        "코드에서 발견된 신호를 근거로 질문을 생성합니다. 근거 없는 질문은 하지 않습니다.",
     },
     {
-      title: "피드백 준비 상태",
+      title: "피드백 준비",
       value: MODE_LABEL[session.report_mode],
-      description: "대화가 끝나면 어떤 상태로 피드백이 정리되는지 바로 확인할 수 있습니다.",
+      description:
+        "면접이 끝나면 논리 구조·기술 정확도·설명 명료도 3가지 기준으로 피드백이 생성됩니다.",
     },
   ];
 
@@ -346,8 +362,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         <div className="card code-panel">
           <div className="panel-header">
             <div>
-              <div className="eyebrow">Stage 01</div>
-              <h2>코드 비교 제출</h2>
+              <div className="eyebrow">풀이 코드 입력</div>
+              <h2>코드를 제출하면 면접이 시작됩니다</h2>
             </div>
             <button className="primary" onClick={handleSubmitCode} disabled={submitting}>
               {submitting ? "제출 중..." : "코드 제출"}
@@ -360,8 +376,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           {problem.demo_variants.length > 0 ? (
             <div className="variant-grid">
-              {problem.demo_variants.map((variant) => {
+              {problem.demo_variants.map((variant, index) => {
                 const selected = selectedVariant?.id === variant.id;
+                const isRecommended = index === 0;
                 return (
                   <button
                     key={variant.id}
@@ -369,7 +386,12 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                     onClick={() => handleLoadVariant(variant.id)}
                     type="button"
                   >
-                    <span className="eyebrow">{variant.label}</span>
+                    <div className="variant-card-head">
+                      <span className="eyebrow">{variant.label}</span>
+                      {isRecommended && (
+                        <span className="variant-recommended-badge">여기서 시작</span>
+                      )}
+                    </div>
                     <strong>{FLOW_META[variant.expected_flow].label}</strong>
                     <span>{variant.purpose}</span>
                     <small>{variant.expected_signals.join(" / ")}</small>
@@ -410,8 +432,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         <div className="card interview-panel">
           <div className="panel-header">
             <div>
-              <div className="eyebrow">Stage 02</div>
-              <h2>면접 진행</h2>
+              <div className="eyebrow">설명 면접</div>
+              <h2>AI 면접관과 대화</h2>
             </div>
             <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
           </div>
@@ -549,6 +571,15 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 <p>{axis.next_step}</p>
               </article>
             ))}
+          </div>
+
+          <div className="report-actions">
+            <button className="primary" onClick={retryBootstrap}>
+              이 문제 다시 연습하기
+            </button>
+            <Link className="secondary-button" href="/">
+              다른 문제 선택하기
+            </Link>
           </div>
 
           <div className="report-bottom">

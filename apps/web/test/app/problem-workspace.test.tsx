@@ -68,7 +68,7 @@ describe("ProblemWorkspace", () => {
 
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
-    expect(await screen.findByRole("heading", { name: "코드 비교 제출" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "코드를 제출하면 면접이 시작됩니다" })).toBeInTheDocument();
     expect(screen.getByText("느린 코드").closest("button")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeInTheDocument();
     expect(screen.getByText("positive numbers")).toBeInTheDocument();

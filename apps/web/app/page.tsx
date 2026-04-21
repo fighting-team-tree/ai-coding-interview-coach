@@ -92,11 +92,11 @@ export default function HomePage() {
         <div className="service-side-column">
           <article className="card service-summary-card">
             <div className="service-summary-header">
-              <div className="eyebrow">최근 피드백 요약</div>
+              <div className="eyebrow">샘플 피드백 미리보기</div>
               <h2>설명 명료도를 먼저 끌어올릴 차례입니다</h2>
               <p className="muted">
-                최근 대표 문제 기준으로는 풀이 전환 근거를 더 짧고 선명하게 말하는 연습이 다음
-                액션으로 추천됩니다.
+                직접 풀이를 제출하면 이런 형태의 3축 피드백을 받을 수 있습니다. 논리 구조,
+                기술 정확도, 설명 명료도 각각 점수와 다음 액션이 제공됩니다.
               </p>
             </div>
 
