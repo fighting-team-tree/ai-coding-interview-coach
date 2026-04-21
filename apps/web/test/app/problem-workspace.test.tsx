@@ -72,6 +72,8 @@ describe("ProblemWorkspace", () => {
     expect(screen.getByText("느린 코드").closest("button")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeInTheDocument();
     expect(screen.getByText("positive numbers")).toBeInTheDocument();
+    expect(screen.getByText("질문이 참고하는 기준")).toBeInTheDocument();
+    expect(screen.queryByText("기관 활용 포인트")).not.toBeInTheDocument();
   });
 
   it("shows bootstrap errors and skips session creation when the problem fetch fails", async () => {

@@ -58,6 +58,11 @@ const MODE_LABEL = {
   deterministic: "규칙 기반",
 } as const;
 
+const EXECUTION_MODE_LABEL = {
+  judge0: "실행 서버",
+  demo: "샘플 실행",
+} as const;
+
 const EVIDENCE_LABEL = {
   fact: "사실",
   trap: "함정",
@@ -259,7 +264,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
   const proofMeta = [
     {
-      title: "현재 분기",
+      title: "현재 질문 흐름",
       value: session.branch_decision
         ? FLOW_META[session.branch_decision.flow_type].label
         : "코드 제출 대기",
@@ -268,14 +273,14 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         "코드를 제출하면 코드 신호를 바탕으로 질문 흐름이 정해집니다.",
     },
     {
-      title: "질문 생성 방식",
+      title: "질문 생성 상태",
       value: MODE_LABEL[session.question_mode],
-      description: "외부 모델 상태와 관계없이 준비된 질문 계획으로 세션을 이어갈 수 있습니다.",
+      description: "현재 질문이 어떤 방식으로 이어지고 있는지 한눈에 보여줍니다.",
     },
     {
-      title: "리포트 생성 방식",
+      title: "피드백 준비 상태",
       value: MODE_LABEL[session.report_mode],
-      description: "피드백도 대체 생성 경로를 갖고 있어 데모가 중간에 끊기지 않습니다.",
+      description: "대화가 끝나면 어떤 상태로 피드백이 정리되는지 바로 확인할 수 있습니다.",
     },
   ];
 
@@ -305,11 +310,11 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
         <aside className="workspace-brief">
           <div className="brief-block">
-            <div className="eyebrow">문제 훅</div>
+            <div className="eyebrow">이 문제에서 보게 될 것</div>
             <p>{problem.elevator_pitch}</p>
           </div>
           <div className="brief-block">
-            <div className="eyebrow">핵심 기준 정보</div>
+            <div className="eyebrow">질문이 참고하는 기준</div>
             <ul className="mini-list">
               {problem.facts.map((fact) => (
                 <li key={fact}>{fact}</li>
@@ -317,7 +322,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             </ul>
           </div>
           <div className="brief-block">
-            <div className="eyebrow">질문 제한 범위</div>
+            <div className="eyebrow">질문이 벗어나지 않는 범위</div>
             <ul className="mini-list">
               {problem.forbidden_boundaries.map((boundary) => (
                 <li key={boundary}>{boundary}</li>
@@ -390,7 +395,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               <div className="judge-head">
                 <strong>{session.judge_result.status}</strong>
                 <span className={`mode-chip ${session.judge_result.passed ? "success" : "warning"}`}>
-                  {session.judge_result.mode === "judge0" ? "Judge0" : "데모"}
+                  {EXECUTION_MODE_LABEL[session.judge_result.mode]}
                 </span>
               </div>
               <p>
@@ -548,8 +553,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="report-bottom">
             <div className="card subtle share-preview">
-              <div className="eyebrow">세션 안정성</div>
-              <h3>끝까지 이어지는 평가 흐름</h3>
+              <div className="eyebrow">세션 요약</div>
+              <h3>이번 세션에서 어떤 흐름을 탔는지</h3>
               <p>
                 분기:{" "}
                 {session.branch_decision
@@ -559,14 +564,14 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 {MODE_LABEL[session.report_mode]}
               </p>
               <p className="muted">
-                외부 모델이 불안정하더라도 질문과 피드백이 중간에 끊기지 않도록 설계된 구조를
-                보여줍니다.
+                어떤 코드 신호 때문에 이 질문 흐름이 선택됐는지, 그리고 피드백이 어떤 방식으로
+                정리됐는지 빠르게 복기할 수 있습니다.
               </p>
             </div>
 
             <div className="card subtle">
-              <div className="eyebrow">기관 활용 포인트</div>
-              <h3>반복 훈련에 쌓이는 약점 신호</h3>
+              <div className="eyebrow">다음 연습 포인트</div>
+              <h3>다음 세션에서 먼저 보완할 약점</h3>
               <p>
                 약한 축: {weakestAxis?.label ?? "미확정"} / 대표 신호:{" "}
                 {session.branch_decision?.primary_signal ?? "대기"}
