@@ -15,36 +15,27 @@ vi.mock("next/link", () => ({
 }));
 
 describe("HomePage", () => {
-  it("renders the flagship demo framing and supporting scenarios", () => {
+  it("renders a service-style dashboard home instead of the old static preview", () => {
     render(<HomePage />);
 
     expect(
-      screen.getByRole("heading", {
-        name: "같은 문제라도 코드가 다르면 질문이 달라집니다",
-      }),
-    ).toBeInTheDocument();
+      screen.getAllByRole("heading", { name: problemCatalog[0].title }).length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("heading", { name: "설명 명료도를 먼저 끌어올릴 차례입니다" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "설명 면접을 바로 시작할 문제를 고르세요" })).toBeInTheDocument();
+    expect(screen.getByText("오늘의 추천 인터뷰")).toBeInTheDocument();
+    expect(screen.getByText("최근 피드백 요약")).toBeInTheDocument();
+    expect(screen.getByText("지금 연습할 문제")).toBeInTheDocument();
+    expect(screen.getByText(problemCatalog[1].title)).toBeInTheDocument();
 
-    expect(screen.getByText("질문 통제")).toBeInTheDocument();
-    expect(screen.getByText("일반 심화 질문")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "대표 데모 보기" })).toHaveAttribute(
-      "href",
-      `/problems/${problemCatalog[0].id}`,
-    );
+    expect(screen.queryByRole("heading", { name: "코드 비교 제출" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "면접 진행" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "질문 근거와 피드백" })).not.toBeInTheDocument();
+    expect(screen.queryByText("느린 풀이 선택됨")).not.toBeInTheDocument();
 
-    const scenarioLinks = screen
+    const flagshipLinks = screen
       .getAllByRole("link")
-      .filter((link) => link.getAttribute("href")?.startsWith("/problems/"));
-    expect(scenarioLinks.length).toBeGreaterThanOrEqual(problemCatalog.length - 1);
-
-    for (const problem of problemCatalog.slice(1)) {
-      const title = screen
-        .getAllByText(problem.title)
-        .find((node) => node.closest("a")?.getAttribute("href") === `/problems/${problem.id}`);
-      if (!title) {
-        throw new Error(`Missing scenario link for ${problem.id}`);
-      }
-      expect(title).toBeInTheDocument();
-      expect(title.closest("a")).toHaveAttribute("href", `/problems/${problem.id}`);
-    }
+      .filter((link) => link.getAttribute("href") === `/problems/${problemCatalog[0].id}`);
+    expect(flagshipLinks.length).toBeGreaterThanOrEqual(2);
   });
 });
