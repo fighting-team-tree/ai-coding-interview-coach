@@ -124,7 +124,8 @@ strong,
 .service-home-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.18fr) minmax(340px, 420px);
+  align-items: start;
 }
 
 .service-hero-card {
@@ -147,6 +148,7 @@ strong,
   display: grid;
   gap: 14px;
   max-width: 680px;
+  min-width: 0;
 }
 
 .service-hero-copy h1 {
@@ -206,6 +208,7 @@ strong,
 .service-quick-card {
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .service-summary-header {
@@ -231,7 +234,7 @@ strong,
 .service-score-list li {
   display: grid;
   gap: 12px;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(88px, auto) minmax(0, 1fr) auto;
   align-items: center;
 }
 
@@ -258,12 +261,13 @@ strong,
 .service-signal-strip {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .service-signal-card {
   display: grid;
   gap: 6px;
+  align-content: start;
   padding: 14px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -301,6 +305,7 @@ strong,
 .service-problem-card {
   display: grid;
   gap: 16px;
+  grid-template-rows: auto 1fr auto;
   min-height: 248px;
   transition:
     transform 180ms ease,
@@ -322,12 +327,28 @@ strong,
     rgba(12, 22, 35, 0.88);
 }
 
-.service-problem-meta,
+.service-problem-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.service-problem-meta .eyebrow {
+  min-width: 0;
+  line-height: 1.45;
+}
+
+.service-problem-meta .difficulty-pill {
+  white-space: nowrap;
+}
+
 .service-problem-footer {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .service-problem-copy {
@@ -758,13 +779,35 @@ strong,
 .workspace-main-grid {
   display: grid;
   gap: 20px;
-  grid-template-columns: 1.05fr 0.95fr 0.78fr;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  grid-template-areas:
+    "code interview"
+    "evidence evidence";
 }
 
 .workspace-hero {
   display: grid;
   gap: 18px;
-  grid-template-columns: 1.3fr 0.9fr;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.9fr);
+}
+
+.workspace-hero-copy,
+.code-panel,
+.interview-panel,
+.evidence-panel {
+  min-width: 0;
+}
+
+.code-panel {
+  grid-area: code;
+}
+
+.interview-panel {
+  grid-area: interview;
+}
+
+.evidence-panel {
+  grid-area: evidence;
 }
 
 .workspace-brief {
@@ -994,6 +1037,7 @@ strong,
 .evidence-stack {
   display: grid;
   gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .evidence-block {
@@ -1164,6 +1208,10 @@ strong,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .service-hero-badges {
+    justify-items: start;
+  }
+
   .hero-proof-grid {
     grid-template-columns: 1fr;
   }
@@ -1176,7 +1224,8 @@ strong,
   .comparison-grid,
   .variant-grid,
   .service-metric-row,
-  .service-signal-strip {
+  .service-signal-strip,
+  .evidence-stack {
     grid-template-columns: 1fr;
   }
 
@@ -1252,5 +1301,10 @@ strong,
     display: grid;
     grid-template-columns: 1fr;
     align-items: stretch;
+  }
+
+  .service-score-list li {
+    grid-template-columns: 1fr;
+    align-items: start;
   }
 }
