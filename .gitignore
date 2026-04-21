@@ -76,6 +76,11 @@ tmp/
 .pnpm-store/
 *.tsbuildinfo
 
+# bkit plugin files (local AI tooling state)
+.bkit/
+docs/.bkit-memory.json
+docs/.pdca-status.json
+
 # Local Playwright inspection artifacts
 .playwright-mcp/
 .playwright-mcp/img/
