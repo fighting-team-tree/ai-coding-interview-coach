@@ -13,9 +13,18 @@ export type ProblemDetail = ProblemSummary & {
   starter_code: string;
   expected_complexity: string;
   optimal_solution: string;
+  facts: string[];
   follow_up_goals: string[];
   forbidden_boundaries: string[];
   traps: Array<{ signal: string; hint: string; interview_focus: string }>;
+  demo_variants: Array<{
+    id: string;
+    label: string;
+    purpose: string;
+    code: string;
+    expected_flow: "normal" | "plan_b" | "fallback";
+    expected_signals: string[];
+  }>;
 };
 
 export type SessionStatus = "created" | "submitted" | "interviewing" | "evaluating" | "completed";
@@ -25,7 +34,18 @@ export type Session = {
   problem_id: string | null;
   status: SessionStatus;
   current_question: string | null;
-  turns: Array<{ id: string; role: "assistant" | "user"; content: string }>;
+  turns: Array<{
+    id: string;
+    role: "assistant" | "user";
+    content: string;
+    intent?: string | null;
+    evidence_refs: Array<{
+      kind: "fact" | "trap" | "ast" | "goal" | "boundary" | "branch";
+      label: string;
+      detail: string;
+    }>;
+    guardrail_note?: string | null;
+  }>;
   judge_result?: {
     status: string;
     passed: boolean;
@@ -42,6 +62,13 @@ export type Session = {
     notes: string[];
   } | null;
   flow_type?: "normal" | "plan_b" | "fallback" | null;
+  branch_decision?: {
+    flow_type: "normal" | "plan_b" | "fallback";
+    reason_codes: string[];
+    primary_signal: string;
+  } | null;
+  question_mode: "pending" | "llm" | "deterministic";
+  report_mode: "pending" | "llm" | "deterministic";
 };
 
 export type FeedbackReport = {

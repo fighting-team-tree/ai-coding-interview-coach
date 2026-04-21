@@ -15,17 +15,18 @@ vi.mock("next/link", () => ({
 }));
 
 describe("HomePage", () => {
-  it("renders the new demo framing and a card for every problem", () => {
+  it("renders the flagship demo framing and supporting scenarios", () => {
     render(<HomePage />);
 
     expect(
       screen.getByRole("heading", {
-        name: "코딩 테스트 직후, AI가 내 코드의 약점을 근거로 압박 면접을 만든다",
+        name: "같은 문제라도 코드가 다르면 질문이 달라집니다",
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText("Controlled Interview AI")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "대표 데모 시작하기" })).toHaveAttribute(
+    expect(screen.getByText("질문 통제")).toBeInTheDocument();
+    expect(screen.getByText("일반 심화 질문")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "대표 데모 보기" })).toHaveAttribute(
       "href",
       `/problems/${problemCatalog[0].id}`,
     );
@@ -33,9 +34,9 @@ describe("HomePage", () => {
     const scenarioLinks = screen
       .getAllByRole("link")
       .filter((link) => link.getAttribute("href")?.startsWith("/problems/"));
-    expect(scenarioLinks.length).toBeGreaterThanOrEqual(problemCatalog.length);
+    expect(scenarioLinks.length).toBeGreaterThanOrEqual(problemCatalog.length - 1);
 
-    for (const problem of problemCatalog) {
+    for (const problem of problemCatalog.slice(1)) {
       const title = screen
         .getAllByText(problem.title)
         .find((node) => node.closest("a")?.getAttribute("href") === `/problems/${problem.id}`);

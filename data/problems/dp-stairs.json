@@ -16,8 +16,13 @@
     }
   ],
   "starter_code": "def climb_stairs(n: int) -> int:\n    # TODO: implement\n    return 0\n",
-  "expected_complexity": "O(N) time, O(1) or O(N) space",
+  "expected_complexity": "O(N) 시간, O(1) 또는 O(N) 공간",
   "optimal_solution": "Use DP recurrence dp[i] = dp[i-1] + dp[i-2] and compress space if needed.",
+  "facts": [
+    "n번째 계단에 도달하는 방법 수는 직전 한 칸과 두 칸 전 상태의 합으로 표현된다.",
+    "기저 조건 n=1, n=2를 명확히 두어야 점화식이 자연스럽게 이어진다.",
+    "배열 DP와 변수 두 개 압축은 시간복잡도는 같고 공간복잡도만 다르다."
+  ],
   "follow_up_goals": [
     "점화식을 자연어로 설명한다.",
     "배열 DP와 변수 2개 압축의 차이를 설명한다."
@@ -38,4 +43,3 @@
     }
   ]
 }
-

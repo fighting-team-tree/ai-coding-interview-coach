@@ -17,8 +17,13 @@
     }
   ],
   "starter_code": "from collections import deque\n\n\ndef shortest_escape(grid: list[list[int]]) -> int:\n    # TODO: implement\n    return -1\n",
-  "expected_complexity": "O(R*C) time, O(R*C) space",
+  "expected_complexity": "O(R*C) 시간, O(R*C) 공간",
   "optimal_solution": "Use BFS with a queue and visited marking to guarantee the first arrival is the shortest path.",
+  "facts": [
+    "격자 최단거리는 모든 이동 비용이 같을 때 BFS 레벨 순회가 보장한다.",
+    "방문 처리는 큐에 넣는 시점에 해야 같은 칸의 중복 진입을 줄일 수 있다.",
+    "DFS는 도달 가능성은 확인하지만 최초 도달이 최단거리라는 보장을 주지 않는다."
+  ],
   "follow_up_goals": [
     "왜 DFS가 아니라 BFS가 최단 거리 보장에 적합한지 말한다.",
     "visited 처리를 언제 해야 중복 방문이 줄어드는지 설명한다."
@@ -39,4 +44,3 @@
     }
   ]
 }
-

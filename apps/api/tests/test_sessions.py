@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from types import SimpleNamespace
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.models import FeedbackAxis, FeedbackReport, InterviewSession, JudgeResult, SessionStatus
@@ -153,3 +154,74 @@ def test_judge0_demo_mode_does_not_mark_submission_as_passed() -> None:
     assert result.mode == "demo"
     assert result.passed is False
     assert result.status == "Demo mode: Judge0 not configured"
+
+
+@pytest.mark.parametrize(
+    ("code", "expected_flow", "expected_reason"),
+    [
+        (
+            (
+                "def min_subarray_len(target, nums):\n"
+                "    best = len(nums) + 1\n"
+                "    for left in range(len(nums)):\n"
+                "        current = 0\n"
+                "        for right in range(left, len(nums)):\n"
+                "            current += nums[right]\n"
+                "            if current >= target:\n"
+                "                best = min(best, right - left + 1)\n"
+                "                break\n"
+                "    return 0 if best == len(nums) + 1 else best\n"
+            ),
+            "normal",
+            "nested_loops_detected",
+        ),
+        (
+            (
+                "def min_subarray_len(target, nums):\n"
+                "    left = 0\n"
+                "    current = 0\n"
+                "    best = len(nums) + 1\n"
+                "    for right, value in enumerate(nums):\n"
+                "        current += value\n"
+                "        while current >= target:\n"
+                "            best = min(best, right - left + 1)\n"
+                "            current -= nums[left]\n"
+                "            left += 1\n"
+                "    return 0 if best == len(nums) + 1 else best\n"
+            ),
+            "plan_b",
+            "no_risky_ops",
+        ),
+        (
+            "def min_subarray_len(target, nums):\n    for value in nums\n        return value\n",
+            "fallback",
+            "parse_failed",
+        ),
+    ],
+)
+def test_submit_code_exposes_branch_decision_and_evidence(
+    client: TestClient,
+    monkeypatch,
+    code: str,
+    expected_flow: str,
+    expected_reason: str,
+) -> None:
+    monkeypatch.setattr(sessions_router, "get_judge_client", lambda: sessions_router.judge_client)
+    monkeypatch.setattr(
+        sessions_router,
+        "judge_client",
+        SimpleNamespace(execute_python=_fake_execute_python),
+    )
+
+    create_response = client.post("/sessions", json={"problem_id": "two-pointer-window"})
+    session_id = create_response.json()["session"]["id"]
+
+    submit_response = client.post(f"/sessions/{session_id}/submit", json={"code": code})
+
+    assert submit_response.status_code == 200
+    payload = submit_response.json()["session"]
+    assert payload["branch_decision"]["flow_type"] == expected_flow
+    assert expected_reason in payload["branch_decision"]["reason_codes"]
+    assert payload["question_mode"] == "deterministic"
+    assert payload["turns"][0]["intent"]
+    assert any(ref["kind"] == "boundary" for ref in payload["turns"][0]["evidence_refs"])

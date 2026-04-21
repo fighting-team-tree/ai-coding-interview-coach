@@ -19,6 +19,31 @@ class _Analyzer(ast.NodeVisitor):
         self.recursion_detected = False
         self.branch_points = 1
 
+    def _is_sliding_window_shrink_loop(self, node: ast.While) -> bool:
+        if not isinstance(node.test, ast.Compare):
+            return False
+
+        has_pointer_increment = False
+        has_window_shrink = False
+
+        for child in ast.walk(node):
+            if (
+                isinstance(child, ast.AugAssign)
+                and isinstance(child.target, ast.Name)
+                and isinstance(child.op, ast.Add)
+                and isinstance(child.value, ast.Constant)
+                and child.value.value == 1
+            ):
+                has_pointer_increment = True
+            if (
+                isinstance(child, ast.AugAssign)
+                and isinstance(child.target, ast.Name)
+                and isinstance(child.op, ast.Sub)
+            ):
+                has_window_shrink = True
+
+        return has_pointer_increment and has_window_shrink
+
     def visit_For(self, node: ast.For) -> None:  # noqa: N802
         self.loop_depth += 1
         self.max_loop_depth = max(self.max_loop_depth, self.loop_depth)
@@ -27,11 +52,13 @@ class _Analyzer(ast.NodeVisitor):
         self.loop_depth -= 1
 
     def visit_While(self, node: ast.While) -> None:  # noqa: N802
-        self.loop_depth += 1
-        self.max_loop_depth = max(self.max_loop_depth, self.loop_depth)
         self.branch_points += 1
+        if not self._is_sliding_window_shrink_loop(node):
+            self.loop_depth += 1
+            self.max_loop_depth = max(self.max_loop_depth, self.loop_depth)
         self.generic_visit(node)
-        self.loop_depth -= 1
+        if not self._is_sliding_window_shrink_loop(node):
+            self.loop_depth -= 1
 
     def visit_If(self, node: ast.If) -> None:  # noqa: N802
         self.branch_points += 1

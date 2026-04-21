@@ -4,7 +4,7 @@
   "pattern": "Binary Search",
   "difficulty": "medium",
   "elevator_pitch": "정답 범위 위에서 조건을 판별하며 최대 가능한 값을 찾는 문제",
-  "prompt": "요청 예산 배열 requests 와 총 예산 total 이 주어진다. 각 요청이 상한선 cap 을 넘으면 cap 으로 잘라 합산할 때, 총합이 total 이하가 되도록 하는 최대 cap 을 반환하라.",
+  "prompt": "요청 예산 배열 requests와 총 예산 total이 주어진다. 각 요청이 상한선 cap을 넘으면 cap으로 잘라 합산할 때, 총합이 total 이하가 되도록 하는 최대 cap을 반환하라.",
   "constraints": [
     "1 <= requests.length <= 100000",
     "1 <= requests[i] <= 100000"
@@ -17,8 +17,13 @@
     }
   ],
   "starter_code": "def max_budget_cap(requests: list[int], total: int) -> int:\n    # TODO: implement\n    return 0\n",
-  "expected_complexity": "O(N log M) where M is the max request",
+  "expected_complexity": "O(N log M) 시간, 여기서 M은 최대 요청값",
   "optimal_solution": "Binary search the cap and use a monotonic feasibility check on the capped sum.",
+  "facts": [
+    "cap이 커질수록 잘린 예산 합은 감소하지 않으므로 판별 함수가 단조적이다.",
+    "정답은 요청 배열 자체가 아니라 cap 값의 범위 위에서 탐색할 수 있다.",
+    "각 cap 후보 검증은 requests 전체를 한 번 순회하며 계산하면 충분하다."
+  ],
   "follow_up_goals": [
     "왜 정렬 없이도 cap 범위에서 이분 탐색이 가능한지 설명한다.",
     "판별 함수의 단조성을 말한다."
@@ -39,4 +44,3 @@
     }
   ]
 }
-

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "AI Champion | Socratic Deep-Dive",
   description:
-    "코딩 테스트 직후 AST 근거와 Fact/Trap 가드레일로 AI 심층 면접을 이어가는 AI Champion 데모",
+    "제출 코드와 문제 기준 정보를 바탕으로 질문 근거와 분기 흐름을 보여주는 AI Champion 기술면접 데모",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

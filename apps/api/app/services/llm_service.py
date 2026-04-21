@@ -6,7 +6,14 @@ from dataclasses import dataclass
 from pydantic import BaseModel
 
 from app.config import get_settings
-from app.models import AstProfile, FeedbackAxis, FeedbackReport, InterviewSession, Problem
+from app.models import (
+    AstProfile,
+    FeedbackAxis,
+    FeedbackReport,
+    InterviewSession,
+    Problem,
+    QuestionPlan,
+)
 
 try:
     from pydantic_ai import Agent
@@ -37,21 +44,24 @@ class LLMService:
         session: InterviewSession,
         ast_profile: AstProfile,
         answer: str | None,
+        question_plan: QuestionPlan,
     ) -> tuple[str, str]:
         system_prompt = (
             "You are an interview agent for coding test debriefs. "
-            "Stay inside the provided problem facts. Never reveal the full answer. "
-            "Ask one concise follow-up question at a time."
+            "Rewrite the provided interview plan into one concise follow-up question. "
+            "Stay inside the supplied facts and guardrail. Never reveal the full answer."
         )
         user_prompt = f"""
 Problem: {problem.title}
 Pattern: {problem.pattern}
 Expected complexity: {problem.expected_complexity}
 Optimal solution: {problem.optimal_solution}
+Facts: {problem.facts}
 Forbidden boundaries: {problem.forbidden_boundaries}
 Follow-up goals: {problem.follow_up_goals}
 Detected AST profile: {ast_profile.model_dump()}
 Current flow: {session.flow_type}
+Selected question plan: {question_plan}
 Answer from candidate: {answer or "No answer yet. Generate the opening question."}
 Prior turns: {[turn.model_dump() for turn in session.turns[-4:]]}
 """
@@ -85,17 +95,18 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
         session: InterviewSession,
         ast_profile: AstProfile,
         answer: str | None,
-        fallback_question: str,
-    ) -> str:
+        question_plan: QuestionPlan,
+    ) -> tuple[str, str]:
         settings = get_settings()
         if Agent is None or not settings.interview_model:
-            return fallback_question
+            return question_plan.prompt, "deterministic"
 
         system_prompt, user_prompt = self._build_question_prompt(
             problem=problem,
             session=session,
             ast_profile=ast_profile,
             answer=answer,
+            question_plan=question_plan,
         )
 
         try:
@@ -105,21 +116,21 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
                 system_prompt=system_prompt,
             )
             result = await agent.run(user_prompt)
-            return result.output.question.strip()
+            return result.output.question.strip(), "llm"
         except Exception:
             logger.exception("Falling back to deterministic interview question generation")
-            return fallback_question
+            return question_plan.prompt, "deterministic"
 
     async def generate_report(
         self,
         *,
         problem: Problem,
         session: InterviewSession,
-    ) -> FeedbackReport:
+    ) -> tuple[FeedbackReport, str]:
         fallback = build_fallback_report(problem=problem, session=session)
         settings = get_settings()
         if Agent is None or not settings.report_model:
-            return fallback
+            return fallback, "deterministic"
 
         system_prompt, user_prompt = self._build_report_prompt(problem=problem, session=session)
 
@@ -138,10 +149,10 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
                 technical_accuracy=draft.technical_accuracy,
                 explanation_clarity=draft.explanation_clarity,
                 recommended_drills=draft.recommended_drills,
-            )
+            ), "llm"
         except Exception:
             logger.exception("Falling back to heuristic report generation")
-            return fallback
+            return fallback, "deterministic"
 
 
 def build_fallback_report(*, problem: Problem, session: InterviewSession) -> FeedbackReport:

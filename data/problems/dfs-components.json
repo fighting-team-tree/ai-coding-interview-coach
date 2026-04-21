@@ -17,11 +17,16 @@
     }
   ],
   "starter_code": "def count_components(n: int, edges: list[list[int]]) -> int:\n    # TODO: implement\n    return 0\n",
-  "expected_complexity": "O(V + E) time, O(V + E) space",
+  "expected_complexity": "O(V + E) 시간, O(V + E) 공간",
   "optimal_solution": "Build an adjacency list and traverse each unvisited node once with DFS or BFS.",
+  "facts": [
+    "연결 요소 개수는 아직 방문하지 않은 정점에서 탐색을 시작한 횟수와 같다.",
+    "무방향 그래프에서는 방문 배열이 없으면 같은 간선을 왕복하며 무한 순회할 수 있다.",
+    "인접 리스트를 미리 만들면 모든 간선을 매번 다시 훑는 비용을 피할 수 있다."
+  ],
   "follow_up_goals": [
     "인접 리스트를 쓰는 이유를 설명한다.",
-    "재귀 DFS와 반복 DFS의 trade-off를 말한다."
+    "재귀 DFS와 반복 DFS의 차이를 설명한다."
   ],
   "forbidden_boundaries": [
     "Union-Find 정답 템플릿을 그대로 제시하지 않는다."
@@ -39,4 +44,3 @@
     }
   ]
 }
-

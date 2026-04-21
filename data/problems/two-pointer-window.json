@@ -4,7 +4,7 @@
   "pattern": "Two Pointer",
   "difficulty": "medium",
   "elevator_pitch": "양끝 포인터를 움직이며 조건을 만족하는 최소 구간 길이를 찾는 문제",
-  "prompt": "양의 정수 배열 nums 와 양의 정수 target 이 주어진다. 합이 target 이상이 되는 연속 부분 수열 중 길이의 최솟값을 반환하라. 만들 수 없으면 0을 반환한다.",
+  "prompt": "양의 정수 배열 nums와 양의 정수 target이 주어진다. 합이 target 이상이 되는 연속 부분 수열 중 길이의 최솟값을 반환하라. 만들 수 없으면 0을 반환한다.",
   "constraints": [
     "1 <= nums.length <= 100000",
     "1 <= nums[i] <= 10000",
@@ -18,8 +18,13 @@
     }
   ],
   "starter_code": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    # TODO: implement\n    return 0\n",
-  "expected_complexity": "O(N) time, O(1) extra space",
+  "expected_complexity": "O(N) 시간, O(1) 추가 공간",
   "optimal_solution": "Maintain a sliding window and shrink from the left whenever the running sum reaches the target.",
+  "facts": [
+    "배열 원소가 모두 양수이기 때문에 오른쪽 포인터를 늘리면 구간 합이 단조 증가한다.",
+    "합이 target 이상이 된 뒤에는 왼쪽 포인터를 당겨도 정답 후보를 잃지 않는다.",
+    "모든 시작점마다 끝점을 다시 찾는 방식은 길이 10만 입력에서 O(N^2)로 무너진다."
+  ],
   "follow_up_goals": [
     "왜 brute force O(N^2) 대신 슬라이딩 윈도우가 가능한지 설명한다.",
     "왼쪽 포인터를 당겨도 되는 조건을 명확히 말한다."
@@ -39,6 +44,39 @@
       "hint": "조건을 이미 만족한 뒤에도 창을 더 줄일 수 있다면, 어떤 불변식을 유지해야 하나요?",
       "interview_focus": "최소 길이 갱신 타이밍"
     }
+  ],
+  "demo_variants": [
+    {
+      "id": "slow_nested",
+      "label": "느린 풀이",
+      "purpose": "중첩 반복으로 모든 구간 합을 다시 계산하는 경우를 보여준다.",
+      "code": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    best = len(nums) + 1\n    for left in range(len(nums)):\n        current = 0\n        for right in range(left, len(nums)):\n            current += nums[right]\n            if current >= target:\n                best = min(best, right - left + 1)\n                break\n    return 0 if best == len(nums) + 1 else best\n",
+      "expected_flow": "normal",
+      "expected_signals": [
+        "중첩 반복문 또는 모든 구간 합 탐색",
+        "중첩 루프 깊이 2"
+      ]
+    },
+    {
+      "id": "clean_window",
+      "label": "안정적인 풀이",
+      "purpose": "위험 연산 없이 슬라이딩 윈도우로 해결하는 경우를 보여준다.",
+      "code": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    left = 0\n    current = 0\n    best = len(nums) + 1\n\n    for right, value in enumerate(nums):\n        current += value\n        while current >= target:\n            best = min(best, right - left + 1)\n            current -= nums[left]\n            left += 1\n\n    return 0 if best == len(nums) + 1 else best\n",
+      "expected_flow": "plan_b",
+      "expected_signals": [
+        "위험 연산 없음",
+        "낮은 루프 깊이"
+      ]
+    },
+    {
+      "id": "broken_parse",
+      "label": "오류 코드",
+      "purpose": "문법 오류가 있을 때 복구형 질문으로 전환되는 상황을 보여준다.",
+      "code": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    left = 0\n    current = 0\n    for value in nums\n        current += value\n    return 0\n",
+      "expected_flow": "fallback",
+      "expected_signals": [
+        "파싱 실패"
+      ]
+    }
   ]
 }
-

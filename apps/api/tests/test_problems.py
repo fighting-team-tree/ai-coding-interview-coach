@@ -19,6 +19,8 @@ def test_read_problem_returns_problem_detail(client: TestClient) -> None:
     payload = response.json()
     assert payload["id"] == "two-pointer-window"
     assert payload["starter_code"]
+    assert payload["facts"]
+    assert payload["demo_variants"][0]["expected_flow"] == "normal"
 
 
 def test_read_problem_returns_404_for_missing_problem(client: TestClient) -> None:

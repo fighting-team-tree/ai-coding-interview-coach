@@ -38,6 +38,15 @@ class Trap(BaseModel):
     interview_focus: str
 
 
+class DemoVariant(BaseModel):
+    id: str
+    label: str
+    purpose: str
+    code: str
+    expected_flow: str
+    expected_signals: list[str]
+
+
 class ProblemSummary(BaseModel):
     id: str
     title: str
@@ -53,9 +62,11 @@ class Problem(ProblemSummary):
     starter_code: str
     expected_complexity: str
     optimal_solution: str
+    facts: list[str]
     follow_up_goals: list[str]
     forbidden_boundaries: list[str]
     traps: list[Trap]
+    demo_variants: list[DemoVariant] = Field(default_factory=list)
 
 
 class JudgeResult(BaseModel):
@@ -82,7 +93,29 @@ class Turn(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     role: Literal["assistant", "user"]
     content: str
+    intent: str | None = None
+    evidence_refs: list["EvidenceRef"] = Field(default_factory=list)
+    guardrail_note: str | None = None
     created_at: datetime = Field(default_factory=utc_now)
+
+
+class EvidenceRef(BaseModel):
+    kind: Literal["fact", "trap", "ast", "goal", "boundary", "branch"]
+    label: str
+    detail: str
+
+
+class BranchDecision(BaseModel):
+    flow_type: FlowType
+    reason_codes: list[str]
+    primary_signal: str
+
+
+class QuestionPlan(BaseModel):
+    prompt: str
+    intent: str
+    evidence_refs: list[EvidenceRef] = Field(default_factory=list)
+    guardrail_note: str
 
 
 class FeedbackAxis(BaseModel):
@@ -111,6 +144,9 @@ class InterviewSession(BaseModel):
     judge_result: JudgeResult | None = None
     turns: list[Turn] = Field(default_factory=list)
     current_question: str | None = None
+    branch_decision: BranchDecision | None = None
+    question_mode: Literal["pending", "llm", "deterministic"] = "pending"
+    report_mode: Literal["pending", "llm", "deterministic"] = "pending"
     report: FeedbackReport | None = None
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)

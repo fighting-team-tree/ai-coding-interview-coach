@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 
 import {
@@ -25,19 +25,19 @@ const MAX_INTERVIEW_TURNS = 4;
 
 const FLOW_META = {
   normal: {
-    label: "일반 압박 흐름",
+    label: "일반 심화 질문",
     focus: "취약점 기반 꼬리질문",
-    description: "AST와 problem trap을 근거로 코드의 약한 지점을 깊게 파고듭니다.",
+    description: "탐지된 trap과 AST 신호를 근거로 코드의 약한 지점을 압박합니다.",
   },
   plan_b: {
-    label: "확장 검증 흐름",
-    focus: "Scale-up 압박 질문",
-    description: "정답이 비교적 안정적일 때 더 큰 입력, trade-off, 코드 리뷰 방어로 난도를 올립니다.",
+    label: "확장 검증 질문",
+    focus: "확장 조건 검증",
+    description: "코드 리스크가 낮을 때 더 큰 입력, 트레이드오프, 리뷰 방어 질문으로 확장합니다.",
   },
   fallback: {
-    label: "복구형 흐름",
+    label: "개념 복구 질문",
     focus: "핵심 개념 복구 질문",
-    description: "코드가 복잡하거나 파싱이 불안정할 때 구현 세부보다 접근과 불변식부터 복구합니다.",
+    description: "파싱 실패나 복잡도 과다 상황에서 구현보다 접근과 불변식부터 복구합니다.",
   },
 } as const;
 
@@ -52,13 +52,26 @@ const STATUS_META: Record<
   completed: { label: "피드백 완료", tone: "success" },
 };
 
-function getMatchedTrap(problem: ProblemDetail, assistantTurns: number) {
-  if (assistantTurns <= 0 || problem.traps.length === 0) {
-    return null;
-  }
+const MODE_LABEL = {
+  pending: "대기",
+  llm: "LLM 연동",
+  deterministic: "규칙 기반",
+} as const;
 
-  return problem.traps[Math.min(assistantTurns - 1, problem.traps.length - 1)];
-}
+const EVIDENCE_LABEL = {
+  fact: "사실",
+  trap: "함정",
+  ast: "코드 신호",
+  goal: "질문 목표",
+  boundary: "질문 경계",
+  branch: "분기 근거",
+} as const;
+
+const DIFFICULTY_LABEL = {
+  easy: "기초",
+  medium: "표준",
+  hard: "심화",
+} as const;
 
 export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
@@ -66,6 +79,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const [code, setCode] = useState("");
   const [answer, setAnswer] = useState("");
   const [report, setReport] = useState<FeedbackReport | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [recoveringReport, setRecoveringReport] = useState(false);
@@ -82,6 +96,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         setProblem(null);
         setSession(null);
         setReport(null);
+        setSelectedVariantId(null);
 
         const problemData = await getProblem(problemId);
         if (cancelled) {
@@ -89,7 +104,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         }
 
         setProblem(problemData);
-        setCode(problemData.starter_code);
+        const defaultVariant = problemData.demo_variants[0] ?? null;
+        setSelectedVariantId(defaultVariant?.id ?? null);
+        setCode(defaultVariant?.code ?? problemData.starter_code);
 
         const sessionData = await createSession(problemId);
         if (cancelled) {
@@ -114,11 +131,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     };
   }, [problemId, reloadToken]);
 
-  const assistantTurns = useMemo(
-    () => session?.turns.filter((turn) => turn.role === "assistant").length ?? 0,
-    [session],
-  );
-
+  const assistantTurns = session?.turns.filter((turn) => turn.role === "assistant").length ?? 0;
+  const latestAssistantTurn =
+    [...(session?.turns ?? [])].reverse().find((turn) => turn.role === "assistant") ?? null;
+  const activeFlow = session?.flow_type ? FLOW_META[session.flow_type] : null;
+  const selectedVariant =
+    problem?.demo_variants.find((variant) => variant.id === selectedVariantId) ?? null;
+  const statusMeta = session ? STATUS_META[session.status] : STATUS_META.created;
   const reportAxes = report
     ? [
         { label: "논리 구조", axis: report.logical_structure },
@@ -126,11 +145,6 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         { label: "설명 명료도", axis: report.explanation_clarity },
       ]
     : [];
-
-  const activeFlow = session?.flow_type ? FLOW_META[session.flow_type] : null;
-  const matchedTrap = problem ? getMatchedTrap(problem, assistantTurns) : null;
-  const primaryExample = problem?.examples[0] ?? null;
-  const statusMeta = session ? STATUS_META[session.status] : STATUS_META.created;
   const reportAverage = reportAxes.length
     ? (reportAxes.reduce((sum, item) => sum + item.axis.score, 0) / reportAxes.length).toFixed(1)
     : null;
@@ -141,38 +155,22 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     return weakest;
   }, null);
 
-  const analysisCards = [
-    {
-      title: "선택된 면접 흐름",
-      value: activeFlow?.label ?? "코드 제출 대기",
-      description:
-        activeFlow?.description ?? "코드 제출 후 AST 프로필에 따라 질문 전략이 자동으로 선택됩니다.",
-    },
-    {
-      title: "감지된 신호",
-      value: matchedTrap?.signal ?? "아직 없음",
-      description:
-        matchedTrap?.hint ??
-        "이 영역은 코드 제출 뒤 AST와 problem trap을 연결해 지금 질문이 나온 이유를 설명합니다.",
-    },
-    {
-      title: "현재 질문 의도",
-      value: matchedTrap?.interview_focus ?? activeFlow?.focus ?? "답변 준비 단계",
-      description:
-        session?.current_question ??
-        "첫 질문이 시작되면 이번 턴이 무엇을 검증하려는지 명시적으로 보여줍니다.",
-    },
-    {
-      title: "질문 가드레일",
-      value: "Fact/Trap controlled",
-      description:
-        problem?.forbidden_boundaries[0] ??
-        "면접 질문은 문제 범위를 벗어나지 않도록 가드레일 안에서만 생성됩니다.",
-    },
-  ];
-
   function retryBootstrap() {
     setReloadToken((current) => current + 1);
+  }
+
+  function handleLoadVariant(variantId: string) {
+    if (!problem) {
+      return;
+    }
+
+    const variant = problem.demo_variants.find((item) => item.id === variantId);
+    if (!variant) {
+      return;
+    }
+
+    setSelectedVariantId(variant.id);
+    setCode(variant.code);
   }
 
   async function recoverReport(sessionId: string, preferFinalize = false) {
@@ -245,11 +243,11 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   if (error && (!problem || !session)) {
     return (
       <div className="card error-state">
-        <div className="eyebrow">Workspace Error</div>
+        <div className="eyebrow">불러오기 오류</div>
         <h1>워크스페이스를 불러오지 못했습니다.</h1>
         <p className="muted">{error}</p>
         <button className="primary" onClick={retryBootstrap}>
-          Retry
+          다시 시도
         </button>
       </div>
     );
@@ -259,6 +257,28 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     return <div className="card">워크스페이스를 준비하는 중입니다...</div>;
   }
 
+  const proofMeta = [
+    {
+      title: "현재 분기",
+      value: session.branch_decision
+        ? FLOW_META[session.branch_decision.flow_type].label
+        : "코드 제출 대기",
+      description:
+        session.branch_decision?.primary_signal ??
+        "코드를 제출하면 코드 신호를 바탕으로 질문 흐름이 정해집니다.",
+    },
+    {
+      title: "질문 생성 방식",
+      value: MODE_LABEL[session.question_mode],
+      description: "외부 모델 상태와 관계없이 준비된 질문 계획으로 세션을 이어갈 수 있습니다.",
+    },
+    {
+      title: "리포트 생성 방식",
+      value: MODE_LABEL[session.report_mode],
+      description: "피드백도 대체 생성 경로를 갖고 있어 데모가 중간에 끊기지 않습니다.",
+    },
+  ];
+
   return (
     <div className="workspace">
       <section className="card workspace-hero">
@@ -267,13 +287,14 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <h1>{problem.title}</h1>
           <p className="muted">{problem.prompt}</p>
           <div className="pill-row overview-row">
-            <span className={`difficulty-pill ${problem.difficulty}`}>{problem.difficulty}</span>
+            <span className={`difficulty-pill ${problem.difficulty}`}>
+              {DIFFICULTY_LABEL[problem.difficulty]}
+            </span>
             <span className="pill">권장 복잡도 {problem.expected_complexity}</span>
             <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
             <span className="pill">
               면접 턴 {assistantTurns} / {MAX_INTERVIEW_TURNS}
             </span>
-            <span className="pill">미션: 정답보다 reasoning을 설명하기</span>
           </div>
           <ul className="constraint-list compact-list">
             {problem.constraints.map((constraint) => (
@@ -287,46 +308,72 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className="eyebrow">문제 훅</div>
             <p>{problem.elevator_pitch}</p>
           </div>
-
-          {primaryExample ? (
-            <div className="brief-block">
-              <div className="eyebrow">대표 예시</div>
-              <p>
-                <strong>입력</strong> {primaryExample.input}
-              </p>
-              <p>
-                <strong>출력</strong> {primaryExample.output}
-              </p>
-              <p className="muted">{primaryExample.explanation}</p>
-            </div>
-          ) : null}
-
           <div className="brief-block">
-            <div className="eyebrow">이번 데모 포인트</div>
+            <div className="eyebrow">핵심 기준 정보</div>
             <ul className="mini-list">
-              {problem.follow_up_goals.map((goal) => (
-                <li key={goal}>{goal}</li>
+              {problem.facts.map((fact) => (
+                <li key={fact}>{fact}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="brief-block">
+            <div className="eyebrow">질문 제한 범위</div>
+            <ul className="mini-list">
+              {problem.forbidden_boundaries.map((boundary) => (
+                <li key={boundary}>{boundary}</li>
               ))}
             </ul>
           </div>
         </aside>
       </section>
 
-      <section className="split">
+      <section className="analysis-grid">
+        {proofMeta.map((card) => (
+          <article key={card.title} className="card analysis-card compact">
+            <div className="eyebrow">{card.title}</div>
+            <h2>{card.value}</h2>
+            <p className="muted">{card.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="workspace-main-grid">
         <div className="card code-panel">
           <div className="panel-header">
             <div>
               <div className="eyebrow">Stage 01</div>
-              <h2>코드 제출</h2>
+              <h2>코드 비교 제출</h2>
             </div>
             <button className="primary" onClick={handleSubmitCode} disabled={submitting}>
               {submitting ? "제출 중..." : "코드 제출"}
             </button>
           </div>
           <p className="panel-copy">
-            일부러 덜 최적화된 코드를 넣어도 괜찮습니다. 이 데모의 핵심은 정답 여부보다, AI가
-            어디를 근거로 질문 전략을 여는지 보여주는 데 있습니다.
+            대표 문제에서는 같은 문제에 다른 코드를 넣었을 때 질문 흐름이 어떻게 달라지는지를
+            보여주는 것이 핵심입니다.
           </p>
+
+          {problem.demo_variants.length > 0 ? (
+            <div className="variant-grid">
+              {problem.demo_variants.map((variant) => {
+                const selected = selectedVariant?.id === variant.id;
+                return (
+                  <button
+                    key={variant.id}
+                    className={`variant-card ${selected ? "selected" : ""}`}
+                    onClick={() => handleLoadVariant(variant.id)}
+                    type="button"
+                  >
+                    <span className="eyebrow">{variant.label}</span>
+                    <strong>{FLOW_META[variant.expected_flow].label}</strong>
+                    <span>{variant.purpose}</span>
+                    <small>{variant.expected_signals.join(" / ")}</small>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+
           <div className="editor-frame">
             <Editor
               height="420px"
@@ -337,18 +384,19 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               options={{ minimap: { enabled: false }, fontSize: 14 }}
             />
           </div>
+
           {session.judge_result ? (
             <div className="judge-box">
               <div className="judge-head">
                 <strong>{session.judge_result.status}</strong>
                 <span className={`mode-chip ${session.judge_result.passed ? "success" : "warning"}`}>
-                  {session.judge_result.mode === "judge0" ? "Judge0" : "Demo"}
+                  {session.judge_result.mode === "judge0" ? "Judge0" : "데모"}
                 </span>
               </div>
               <p>
                 {session.judge_result.stdout ||
                   session.judge_result.stderr ||
-                  "No execution output."}
+                  "실행 출력이 없습니다."}
               </p>
             </div>
           ) : null}
@@ -358,7 +406,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className="panel-header">
             <div>
               <div className="eyebrow">Stage 02</div>
-              <h2>면접 세션</h2>
+              <h2>면접 진행</h2>
             </div>
             <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
           </div>
@@ -366,8 +414,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className={`flow-banner ${session.flow_type ?? "idle"}`}>
             <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
             <p>
-              {activeFlow?.description ??
-                "코드를 제출하면 AST와 trap 신호를 기반으로 면접 플로우가 선택됩니다."}
+              {session.branch_decision?.primary_signal ??
+                "코드를 제출하면 코드 신호를 기준으로 질문 흐름이 자동 선택됩니다."}
             </p>
           </div>
 
@@ -377,10 +425,11 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             ) : (
               session.turns.map((turn) => (
                 <div key={turn.id} className={`message ${turn.role}`}>
-                  <div className="message-role">
-                    {turn.role === "assistant" ? "AI Interviewer" : "You"}
-                  </div>
+                  <div className="message-role">{turn.role === "assistant" ? "AI 면접관" : "내 답변"}</div>
                   <div>{turn.content}</div>
+                  {turn.role === "assistant" && turn.intent ? (
+                    <div className="message-intent">{turn.intent}</div>
+                  ) : null}
                 </div>
               ))
             )}
@@ -388,18 +437,18 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="answer-box">
             <div className="answer-guide">
-              <span>이번 답변에 포함하면 좋은 요소</span>
+              <span>이번 답변에 담아보세요</span>
               <div className="answer-pill-row">
-                <span className="pill muted-pill">Approach</span>
-                <span className="pill muted-pill">Complexity</span>
-                <span className="pill muted-pill">Invariant</span>
-                <span className="pill muted-pill">Trade-off</span>
+                <span className="pill muted-pill">접근</span>
+                <span className="pill muted-pill">복잡도</span>
+                <span className="pill muted-pill">불변식</span>
+                <span className="pill muted-pill">트레이드오프</span>
               </div>
             </div>
             <textarea
               value={answer}
               onChange={(event) => setAnswer(event.target.value)}
-              placeholder="풀이 접근, 시간복잡도, 왜 그 선택을 했는지까지 설명해보세요."
+              placeholder="풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요."
               rows={5}
               disabled={session.status === "completed" || submitting || !session.current_question}
             />
@@ -411,41 +460,58 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               {submitting ? "전송 중..." : "답변 보내기"}
             </button>
           </div>
-
-          {session.ast_profile ? (
-            <div className="ast-box">
-              <h3>AST 근거</h3>
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <span className="stat-label">parse_ok</span>
-                  <strong>{String(session.ast_profile.parse_ok)}</strong>
-                </div>
-                <div className="stat-card">
-                  <span className="stat-label">nested_loop_depth</span>
-                  <strong>{session.ast_profile.nested_loop_depth}</strong>
-                </div>
-                <div className="stat-card">
-                  <span className="stat-label">cyclomatic_complexity</span>
-                  <strong>{session.ast_profile.cyclomatic_complexity}</strong>
-                </div>
-                <div className="stat-card">
-                  <span className="stat-label">risky_ops</span>
-                  <strong>{session.ast_profile.has_risky_ops.join(", ") || "none"}</strong>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
-      </section>
 
-      <section className="analysis-grid">
-        {analysisCards.map((card) => (
-          <article key={card.title} className="card analysis-card compact">
-            <div className="eyebrow">{card.title}</div>
-            <h2>{card.value}</h2>
-            <p className="muted">{card.description}</p>
-          </article>
-        ))}
+        <div className="card evidence-panel">
+          <div className="panel-header">
+            <div>
+              <div className="eyebrow">질문 근거</div>
+              <h2>왜 이런 질문이 나왔는지</h2>
+            </div>
+          </div>
+
+          <div className="evidence-stack">
+            <div className="evidence-block">
+              <div className="eyebrow">이번 턴의 확인 포인트</div>
+              <strong>{latestAssistantTurn?.intent ?? "코드 제출 전"}</strong>
+              <p className="muted">
+                {latestAssistantTurn?.guardrail_note ??
+                  "첫 질문이 시작되면 질문 근거와 제한 범위가 함께 표시됩니다."}
+              </p>
+            </div>
+
+            <div className="evidence-block">
+              <div className="eyebrow">지금 쓰인 근거</div>
+              {latestAssistantTurn?.evidence_refs.length ? (
+                <ul className="evidence-list">
+                  {latestAssistantTurn.evidence_refs.map((ref) => (
+                    <li key={`${ref.kind}-${ref.label}-${ref.detail}`}>
+                      <span className={`evidence-tag ${ref.kind}`}>{EVIDENCE_LABEL[ref.kind]}</span>
+                      <div>
+                        <strong>{ref.label}</strong>
+                        <p>{ref.detail}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="muted">코드를 제출하면 턴별 질문 근거가 여기에 표시됩니다.</p>
+              )}
+            </div>
+
+            {session.ast_profile ? (
+              <div className="evidence-block">
+                <div className="eyebrow">코드 분석 요약</div>
+                <ul className="mini-list">
+                  <li>파싱 성공: {String(session.ast_profile.parse_ok)}</li>
+                  <li>중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
+                  <li>순환 복잡도: {session.ast_profile.cyclomatic_complexity}</li>
+                  <li>위험 연산: {session.ast_profile.has_risky_ops.join(", ") || "없음"}</li>
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        </div>
       </section>
 
       {report ? (
@@ -453,15 +519,13 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className="report-header">
             <div>
               <div className="eyebrow">Stage 03</div>
-              <h2>3축 피드백 리포트</h2>
+              <h2>3축 피드백</h2>
               <p>{report.summary}</p>
             </div>
             <div className="report-score-shell">
               <div className="report-score">{reportAverage}/10</div>
-              <p>전체 면접 준비도</p>
-              <span className="muted">
-                가장 약한 축: {weakestAxis?.label ?? "없음"}
-              </span>
+              <p>전체 준비도</p>
+              <span className="muted">가장 약한 축: {weakestAxis?.label ?? "없음"}</span>
             </div>
           </div>
 
@@ -484,16 +548,29 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="report-bottom">
             <div className="card subtle share-preview">
-              <div className="eyebrow">성장 포인트</div>
-              <h3>공유 가능한 성과물처럼 보이게</h3>
+              <div className="eyebrow">세션 안정성</div>
+              <h3>끝까지 이어지는 평가 흐름</h3>
               <p>
-                이 리포트는 단발성 결과가 아니라, 다음 세션에서 어떤 축을 끌어올릴지 연결되는 성장
-                카드여야 합니다. 대회에서는 이 지점이 제품 반복 사용성을 설명합니다.
+                분기:{" "}
+                {session.branch_decision
+                  ? FLOW_META[session.branch_decision.flow_type].label
+                  : "대기"}{" "}
+                / 질문 엔진: {MODE_LABEL[session.question_mode]} / 리포트 엔진:{" "}
+                {MODE_LABEL[session.report_mode]}
+              </p>
+              <p className="muted">
+                외부 모델이 불안정하더라도 질문과 피드백이 중간에 끊기지 않도록 설계된 구조를
+                보여줍니다.
               </p>
             </div>
 
             <div className="card subtle">
-              <h3>추천 드릴</h3>
+              <div className="eyebrow">기관 활용 포인트</div>
+              <h3>반복 훈련에 쌓이는 약점 신호</h3>
+              <p>
+                약한 축: {weakestAxis?.label ?? "미확정"} / 대표 신호:{" "}
+                {session.branch_decision?.primary_signal ?? "대기"}
+              </p>
               <ul className="constraint-list">
                 {report.recommended_drills.map((drill) => (
                   <li key={drill}>{drill}</li>
@@ -510,7 +587,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className="eyebrow">리포트 복구</div>
             <h2>리포트 생성이 지연되거나 실패했을 수 있습니다.</h2>
             <p className="muted">
-              이미 생성된 report를 다시 읽거나, finalize 요청을 한 번 더 보내 복구할 수 있습니다.
+              이미 생성된 리포트를 다시 읽거나, 마무리 요청을 한 번 더 보내 복구할 수 있습니다.
             </p>
           </div>
           <button
