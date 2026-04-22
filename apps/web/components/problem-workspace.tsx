@@ -79,6 +79,92 @@ const DIFFICULTY_LABEL = {
   hard: "심화",
 } as const;
 
+type EvidenceKind = keyof typeof EVIDENCE_LABEL;
+
+type ControlledExample = {
+  question: string;
+  kind: EvidenceKind;
+  source: string;
+};
+
+const CONTROL_COMPARISON: Record<
+  keyof typeof FLOW_META,
+  { generic: string[]; controlled: ControlledExample[] }
+> = {
+  normal: {
+    generic: [
+      "파이썬 데코레이터를 쓰면 더 Pythonic한 풀이가 될까요?",
+      "이 코드 리뷰 좀 해주세요. 전반적으로 어떻게 생각하세요?",
+      "다른 언어로 구현한다면 어떤 언어가 좋을까요?",
+    ],
+    controlled: [
+      {
+        question: "지금 구현의 최악 시간복잡도를 수식으로 설명해 주세요.",
+        kind: "ast",
+        source: "중첩 루프 깊이 신호",
+      },
+      {
+        question: "입력 전제에서 이 접근이 성립하는 핵심 이유를 말씀해 주세요.",
+        kind: "fact",
+        source: "문제 Fact 범위",
+      },
+      {
+        question: "더 나은 접근이 가능한지, 있다면 왜인지 한 문장으로 설명해 주세요.",
+        kind: "goal",
+        source: "Follow-up Goal",
+      },
+    ],
+  },
+  plan_b: {
+    generic: [
+      "이 코드를 리팩토링한다면 어떻게 할까요?",
+      "테스트 코드도 작성해 주실 수 있나요?",
+      "이 풀이를 블로그에 쓴다면 어떻게 소개하시겠어요?",
+    ],
+    controlled: [
+      {
+        question: "입력 규모가 10배 커지면 현재 구현은 어디에서 먼저 한계를 만날까요?",
+        kind: "goal",
+        source: "스케일업 압박",
+      },
+      {
+        question: "메모리 제약이 달라지면 이 자료 구조를 어떻게 방어하시겠어요?",
+        kind: "boundary",
+        source: "Forbidden Boundary",
+      },
+      {
+        question: "시니어 리뷰어가 이 코드를 거절한다면 가장 유력한 이유는 무엇일까요?",
+        kind: "goal",
+        source: "리뷰 방어 훈련",
+      },
+    ],
+  },
+  fallback: {
+    generic: [
+      "왜 에러가 났을까요?",
+      "파이썬 문법을 더 공부해야 할까요?",
+      "디버깅은 어떻게 하시나요?",
+    ],
+    controlled: [
+      {
+        question: "코드는 잠시 접어두고, 이 문제 접근의 핵심 불변식을 한 문장으로 말씀해 주세요.",
+        kind: "goal",
+        source: "핵심 개념 복구",
+      },
+      {
+        question: "지금 시도한 방법이 풀이로서 가능한 전제 조건을 설명해 주세요.",
+        kind: "fact",
+        source: "문제 Fact",
+      },
+      {
+        question: "최소 입력 케이스를 소리 내어 추적해 보세요.",
+        kind: "goal",
+        source: "접근 복구 연습",
+      },
+    ],
+  },
+};
+
 export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const [problem, setProblem] = useState<ProblemDetail | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -358,12 +444,66 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         ))}
       </section>
 
+      {session.ast_profile && session.branch_decision && activeFlow ? (
+        <section className="card trace-strip">
+          <div className="trace-head">
+            <div className="eyebrow">코드 신호 → 분기 결정 → 질문 초점</div>
+            <h2>왜 이 질문 흐름이 선택되었는지</h2>
+            <p className="muted">
+              AST가 뽑은 코드 신호가 어떻게 분기를 결정하고, 어떤 질문 초점으로
+              이어지는지 한 줄에서 확인할 수 있습니다.
+            </p>
+          </div>
+          <div className="trace-body">
+            <div className="trace-step">
+              <div className="eyebrow">1. 코드 신호 (AST)</div>
+              <ul className="mini-list">
+                <li>중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
+                <li>
+                  위험 연산:{" "}
+                  {session.ast_profile.has_risky_ops.length > 0
+                    ? session.ast_profile.has_risky_ops.join(", ")
+                    : "없음"}
+                </li>
+                <li>순환 복잡도: {session.ast_profile.cyclomatic_complexity}</li>
+                <li>파싱: {session.ast_profile.parse_ok ? "성공" : "실패"}</li>
+              </ul>
+            </div>
+            <div className="trace-arrow" aria-hidden="true">
+              →
+            </div>
+            <div className="trace-step">
+              <div className="eyebrow">2. 분기 결정</div>
+              <strong>{activeFlow.label}</strong>
+              <small>{session.branch_decision.primary_signal}</small>
+              {session.branch_decision.reason_codes.length ? (
+                <div className="pill-row">
+                  {session.branch_decision.reason_codes.map((code) => (
+                    <span key={code} className="pill muted-pill">
+                      {code}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <div className="trace-arrow" aria-hidden="true">
+              →
+            </div>
+            <div className="trace-step">
+              <div className="eyebrow">3. 질문 초점</div>
+              <strong>{activeFlow.focus}</strong>
+              <small>{activeFlow.description}</small>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="workspace-main-grid">
         <div className="card code-panel">
           <div className="panel-header">
             <div>
               <div className="eyebrow">풀이 코드 입력</div>
-              <h2>코드를 제출하면 면접이 시작됩니다</h2>
+              <h2>코드를 제출하면 분기 시연이 시작됩니다</h2>
             </div>
             <button className="primary" onClick={handleSubmitCode} disabled={submitting}>
               {submitting ? "제출 중..." : "코드 제출"}
@@ -432,14 +572,21 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         <div className="card interview-panel">
           <div className="panel-header">
             <div>
-              <div className="eyebrow">설명 면접</div>
-              <h2>AI 면접관과 대화</h2>
+              <div className="eyebrow">질문 시연</div>
+              <h2>코드 근거 기반 면접 시연</h2>
             </div>
             <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
           </div>
 
           <div className={`flow-banner ${session.flow_type ?? "idle"}`}>
-            <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
+            <div className="flow-banner-head">
+              <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
+              {session.question_mode === "deterministic" ? (
+                <span className="mode-chip deterministic">
+                  규칙 기반 질문 (시연 안정성 모드)
+                </span>
+              ) : null}
+            </div>
             <p>
               {session.branch_decision?.primary_signal ??
                 "코드를 제출하면 코드 신호를 기준으로 질문 흐름이 자동 선택됩니다."}
@@ -541,8 +688,70 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         </div>
       </section>
 
+      {session.branch_decision ? (
+        <section className="card compare-card">
+          <div className="compare-head">
+            <div className="eyebrow">범용 LLM vs 통제형 질문 생성</div>
+            <h2>같은 코드 입력에 대해 질문이 어떻게 달라지는가</h2>
+            <p className="muted">
+              자유 프롬프트 기반 범용 LLM은 주제 이탈 위험이 크고 근거 추적이 어렵습니다.
+              본 시스템은 문제별 Fact/Trap/Forbidden Boundary 범위 안에서만 질문을
+              생성하므로, 모든 질문에 대해 코드·문제 근거를 역추적할 수 있습니다.
+            </p>
+          </div>
+          <div className="compare-grid">
+            <article className="compare-column generic">
+              <header>
+                <span className="compare-badge warning">범용 대화형 LLM</span>
+                <small>주제 이탈 · 근거 없음 · 검수 불가</small>
+              </header>
+              <ul>
+                {CONTROL_COMPARISON[session.branch_decision.flow_type].generic.map(
+                  (question) => (
+                    <li key={question}>{question}</li>
+                  ),
+                )}
+              </ul>
+            </article>
+            <article className="compare-column controlled">
+              <header>
+                <span className="compare-badge success">통제형 기술면접</span>
+                <small>Fact/Trap 범위 내 · 근거 명시 · 재현 가능</small>
+              </header>
+              <ul>
+                {CONTROL_COMPARISON[session.branch_decision.flow_type].controlled.map(
+                  (example) => (
+                    <li key={example.question}>
+                      <strong>{example.question}</strong>
+                      <div className="compare-evidence-row">
+                        <span className={`evidence-tag ${example.kind}`}>
+                          {EVIDENCE_LABEL[example.kind]}
+                        </span>
+                        <small>{example.source}</small>
+                      </div>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </article>
+          </div>
+        </section>
+      ) : null}
+
       {report ? (
         <section className="card report-section">
+          {session.report_mode === "deterministic" ? (
+            <div className="fallback-assurance">
+              <div className="eyebrow">외부 의존성 대응 모드</div>
+              <p>
+                외부 LLM이 없어도 대화 로그 휴리스틱 기반으로 3축 리포트가 자동 생성됩니다.
+                제안서 2.7에서 정의한 <strong>&apos;외부 의존성 하의 데모 안정성&apos;</strong>{" "}
+                요건 — 외부 API 불안정 상황에서도 세션을 완주하는 fallback 구조가 실제로
+                작동 중입니다.
+              </p>
+            </div>
+          ) : null}
+
           <div className="report-header">
             <div>
               <div className="eyebrow">Stage 03</div>
@@ -575,17 +784,17 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="report-actions">
             <button className="primary" onClick={retryBootstrap}>
-              이 문제 다시 연습하기
+              같은 문제 다시 시연하기
             </button>
             <Link className="secondary-button" href="/">
-              다른 문제 선택하기
+              다른 시연 문제 보기
             </Link>
           </div>
 
           <div className="report-bottom">
             <div className="card subtle share-preview">
-              <div className="eyebrow">세션 요약</div>
-              <h3>이번 세션에서 어떤 흐름을 탔는지</h3>
+              <div className="eyebrow">시연 요약</div>
+              <h3>이번 시연에서 어떤 흐름이 선택됐는지</h3>
               <p>
                 분기:{" "}
                 {session.branch_decision
@@ -601,8 +810,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             </div>
 
             <div className="card subtle">
-              <div className="eyebrow">다음 연습 포인트</div>
-              <h3>다음 세션에서 먼저 보완할 약점</h3>
+              <div className="eyebrow">다음 검증 포인트</div>
+              <h3>다음 시연에서 먼저 확인할 약점 축</h3>
               <p>
                 약한 축: {weakestAxis?.label ?? "미확정"} / 대표 신호:{" "}
                 {session.branch_decision?.primary_signal ?? "대기"}

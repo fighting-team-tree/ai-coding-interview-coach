@@ -6,8 +6,8 @@ test("홈 대시보드에서 대표 문제 CTA를 노출한다", async ({ page }
   await page.goto("/");
 
   await expect(page.getByRole("main").getByText("Socratic Deep-Dive", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "설명 면접을 바로 시작할 문제를 고르세요" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "추천 문제 열기" })).toHaveAttribute(
+  await expect(page.getByRole("heading", { name: "같은 구조로 재현 가능한 추가 시연 문제" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "대표 시연 열기" })).toHaveAttribute(
     "href",
     "/problems/two-pointer-window",
   );
@@ -17,7 +17,7 @@ test("대표 문제에서 코드 제출부터 3축 리포트까지 완료한다"
   await openFeaturedProblem(page);
   await completeInterviewFlow(page);
 
-  await expect(page.getByText("Fallback report generated from transcript heuristics")).toBeVisible();
+  await expect(page.getByText("외부 의존성 대응 모드")).toBeVisible();
   await expect(page.getByText("정의", { exact: true })).toBeVisible();
   await expect(page.getByText("해결", { exact: true })).toBeVisible();
   await expect(page.getByText("설명", { exact: true })).toBeVisible();

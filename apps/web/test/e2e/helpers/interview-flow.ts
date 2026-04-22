@@ -10,9 +10,9 @@ export const interviewAnswers = [
 export async function openFeaturedProblem(page: Page) {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "설명 면접을 바로 시작할 문제를 고르세요" }),
+    page.getByRole("heading", { name: "같은 구조로 재현 가능한 추가 시연 문제" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "바로 시작" }).click();
+  await page.getByRole("link", { name: "대표 분기 시연 시작" }).click();
   await expect(page).toHaveURL(/\/problems\/two-pointer-window$/);
   await expect(page.getByRole("heading", { name: "연속 부분 수열의 최소 길이" })).toBeVisible();
 }

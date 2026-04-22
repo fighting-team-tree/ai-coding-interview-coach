@@ -169,49 +169,48 @@ def build_fallback_report(*, problem: Problem, session: InterviewSession) -> Fee
     return FeedbackReport(
         session_id=session.id,
         summary=(
-            "Fallback report generated from transcript heuristics because model-based "
-            "evaluation was unavailable. "
-            "Further depth is needed on complexity trade-offs and implementation rationale."
+            "모델 미연동 안전 모드: 대화 로그 휴리스틱을 기반으로 자동 생성된 리포트입니다. "
+            "복잡도 트레이드오프와 구현 근거 설명을 조금 더 다듬어야 합니다."
         ),
         logical_structure=FeedbackAxis(
             score=logic_score,
             rationale=(
-                "The explanation covered the broad approach but could connect "
-                "assumptions to consequences more explicitly."
+                "접근 방식을 전반적으로 설명했지만, 가정이 결론으로 이어지는 과정을 "
+                "더 명시적으로 연결할 여지가 있습니다."
             ),
             next_step=(
-                "Practice answering in a fixed structure: approach, "
-                "complexity, edge cases, and trade-off."
+                "접근 · 복잡도 · 엣지 케이스 · 트레이드오프 순서의 고정 구조로 답변을 "
+                "반복 연습해 보세요."
             ),
         ),
         technical_accuracy=FeedbackAxis(
             score=technical_score,
             rationale=(
-                "The candidate stayed close to the expected solution path, "
-                "with some room to sharpen complexity language."
+                "의도한 풀이 경로에 가까웠지만, 복잡도 표현을 더 또렷하게 "
+                "다듬을 여지가 있습니다."
             ),
             next_step=(
-                "Rehearse why the chosen data structure avoids the suboptimal "
-                "operations flagged by the AST profile."
+                "AST 프로파일에서 감지된 위험 연산을 왜 선택한 자료 구조가 "
+                "피해 가는지 말로 설명해 보세요."
             ),
         ),
         explanation_clarity=FeedbackAxis(
             score=clarity_score,
             rationale=(
-                "The response was understandable, but key terms could be stated "
-                "more directly and earlier."
+                "답변은 이해 가능했지만, 핵심 용어를 더 일찍 · 더 직접적으로 "
+                "말할 수 있습니다."
             ),
             next_step=(
-                "Use shorter sentences and say the complexity target before "
-                "discussing implementation details."
+                "구현 세부사항 전에 목표 복잡도를 먼저 선언하고, 문장 길이를 "
+                "짧게 유지해 보세요."
             ),
         ),
         recommended_drills=[
-            f"Re-explain {problem.pattern} solutions in under 60 seconds.",
+            f"{problem.pattern} 풀이를 60초 이내로 재설명해 보세요.",
             (
-                "Answer one follow-up question on edge cases and one on space "
-                "complexity after each coding practice session."
+                "매 연습 세션 뒤 엣지 케이스 1개, 공간 복잡도 1개에 대한 "
+                "꼬리 질문에 답해 보세요."
             ),
-            "Compare the submitted approach against a brute-force baseline out loud.",
+            "제출한 풀이를 무차별 대입 기준선과 소리 내어 비교해 보세요.",
         ],
     )

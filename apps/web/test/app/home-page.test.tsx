@@ -21,11 +21,11 @@ describe("HomePage", () => {
     expect(
       screen.getAllByRole("heading", { name: problemCatalog[0].title }).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole("heading", { name: "설명을 먼저 끌어올릴 차례입니다" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "설명 면접을 바로 시작할 문제를 고르세요" })).toBeInTheDocument();
-    expect(screen.getByText("오늘의 추천 인터뷰")).toBeInTheDocument();
-    expect(screen.getByText("샘플 피드백 미리보기")).toBeInTheDocument();
-    expect(screen.getByText("지금 연습할 문제")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "강사 1인 30명 = 15시간 vs API $3" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "같은 구조로 재현 가능한 추가 시연 문제" })).toBeInTheDocument();
+    expect(screen.getByText("대표 증명 시나리오")).toBeInTheDocument();
+    expect(screen.getByText("기관 운영 비교")).toBeInTheDocument();
+    expect(screen.getByText("추가 검증 시나리오")).toBeInTheDocument();
     expect(screen.getByText(problemCatalog[1].title)).toBeInTheDocument();
 
     expect(screen.queryByRole("heading", { name: "코드 비교 제출" })).not.toBeInTheDocument();
