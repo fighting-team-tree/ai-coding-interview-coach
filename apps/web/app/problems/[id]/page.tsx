@@ -20,7 +20,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
   }
 
   return (
-    <main className="container">
+    <main className="mx-auto w-full max-w-[1240px] px-6 pb-32 pt-8 text-text-primary h-[calc(100vh-64px)]">
       <ProblemWorkspace problemId={id} />
     </main>
   );
