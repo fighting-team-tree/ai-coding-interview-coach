@@ -111,16 +111,23 @@ function extractErrorMessage(status: number, body: string): string {
 }
 
 export function resolveApiBaseUrl(runtimeLocation?: RuntimeLocation): string {
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
-  if (configuredBaseUrl) {
-    return normalizeApiBaseUrl(configuredBaseUrl);
-  }
-
   const location =
     runtimeLocation ??
     (typeof window !== "undefined"
       ? ({ hostname: window.location.hostname, origin: window.location.origin } satisfies RuntimeLocation)
       : null);
+
+  if (location && (location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+    const { port, protocol } = new URL(location.origin);
+    if (port === "3100") {
+      return `${protocol}//${location.hostname}:8110`;
+    }
+  }
+
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  if (configuredBaseUrl) {
+    return normalizeApiBaseUrl(configuredBaseUrl);
+  }
 
   if (!location) {
     return "http://localhost:8000";
@@ -179,6 +186,10 @@ export function submitAnswer(sessionId: string, answer: string): Promise<{ sessi
     method: "POST",
     body: JSON.stringify({ answer })
   });
+}
+
+export function getSession(sessionId: string): Promise<{ session: Session }> {
+  return fetchJson<{ session: Session }>(`/sessions/${sessionId}`);
 }
 
 export function finalizeSession(sessionId: string): Promise<{ report: FeedbackReport }> {

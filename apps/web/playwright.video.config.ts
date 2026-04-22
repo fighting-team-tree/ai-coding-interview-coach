@@ -19,9 +19,9 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "uv run uvicorn app.main:app --host 127.0.0.1 --port 8100",
+      command: "uv run uvicorn app.main:app --host 127.0.0.1 --port 8110",
       cwd: apiDir,
-      url: "http://127.0.0.1:8100/health",
+      url: "http://127.0.0.1:8110/health",
       env: {
         ...process.env,
         FRONTEND_ORIGINS: "http://localhost:3100,http://127.0.0.1:3100",
@@ -35,7 +35,7 @@ export default defineConfig({
       command: "npm run qa:serve",
       cwd: __dirname,
       url: "http://127.0.0.1:3100",
-      reuseExistingServer: false,
+      reuseExistingServer: !process.env.CI,
       stdout: "pipe",
       stderr: "pipe",
       timeout: 60_000,

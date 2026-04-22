@@ -23,6 +23,14 @@ describe("resolveApiBaseUrl", () => {
     );
   });
 
+  it("uses the QA API port when served from the static QA server", () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "http://localhost:8000");
+
+    expect(resolveApiBaseUrl({ hostname: "127.0.0.1", origin: "http://127.0.0.1:3100" })).toBe(
+      "http://127.0.0.1:8110",
+    );
+  });
+
   it("throws a clear error when deployed without an API base URL", () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "");
 

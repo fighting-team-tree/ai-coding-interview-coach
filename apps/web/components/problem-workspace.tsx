@@ -11,6 +11,7 @@ import {
   Session,
   createSession,
   finalizeSession,
+  getSession,
   getProblem,
   getSessionReport,
   submitAnswer,
@@ -311,7 +312,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       }
 
       setReport(recoveredReport);
-      setSession((current) => (current ? { ...current, status: "completed" } : current));
+      const refreshedSession = await getSession(sessionId);
+      setSession(refreshedSession.session);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Report recovery failed");
     } finally {
