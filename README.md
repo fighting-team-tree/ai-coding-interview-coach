@@ -103,3 +103,17 @@ Backend:
 Frontend:
 
 - `NEXT_PUBLIC_API_BASE_URL`
+
+## Competition video pipeline
+
+대회 제출용 자동 데모 영상 파이프라인을 추가했습니다.
+
+```bash
+npm run video:check
+npm run video:competition -- --scenario ai-champion-core --mode demo
+```
+
+- raw clip 생성: `tools/competition-video/record.mjs`
+- mp4 조합: `tools/competition-video/compose.mjs`
+- 시나리오 정의: `tools/competition-video/scenarios/`
+- 자세한 사용법: `tools/competition-video/README.md`

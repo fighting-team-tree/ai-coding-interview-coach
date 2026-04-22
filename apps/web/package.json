@@ -12,7 +12,8 @@
     "qa:install": "playwright install chromium",
     "qa:build": "node ./scripts/build-qa.mjs",
     "qa:serve": "python -m http.server 3100 --directory out",
-    "qa:e2e": "npm run qa:build && playwright test"
+    "qa:e2e": "npm run qa:build && playwright test",
+    "video:manual": "npm run qa:build && playwright test -c playwright.video.config.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

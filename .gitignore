@@ -70,6 +70,7 @@ htmlcov/
 *.db
 *.sqlite
 tmp/
+output/competition-video/
 
 # Node and frontend caches
 .turbo/

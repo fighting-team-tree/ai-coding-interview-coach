@@ -1,0 +1,56 @@
+{
+  "id": "ai-champion-core",
+  "title": "AI Champion Core Workspace Demo",
+  "outputName": "ai-champion-core",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "intro": {
+    "title": "Socratic Deep-Dive",
+    "subtitle": "코딩 테스트 이후 설명 역량을 검증하는 통제형 기술면접 평가 시스템",
+    "details": [
+      "같은 문제에 다른 코드를 넣으면 질문 흐름이 달라집니다.",
+      "질문은 Fact, Trap, Forbidden Boundary 안에서만 생성됩니다."
+    ],
+    "holdMs": 2400
+  },
+  "demo": {
+    "problemPath": "/problems/two-pointer-window",
+    "problemHeading": "연속 부분 수열의 최소 길이",
+    "ctaName": "대표 분기 시연 시작",
+    "variantLabel": "느린 풀이",
+    "typingDelayMs": 24,
+    "holds": {
+      "homeMs": 1400,
+      "problemMs": 1600,
+      "variantMs": 1200,
+      "afterSubmitMs": 1800,
+      "betweenAnswerMs": 900,
+      "reportMs": 2600
+    },
+    "captions": {
+      "home": "대표 시연은 같은 문제에 다른 코드를 넣어 질문 흐름이 달라지는지 증명합니다.",
+      "problem": "대표 문제 워크스페이스로 진입합니다.",
+      "variant": "중첩 반복문이 들어간 느린 풀이를 선택합니다.",
+      "submit": "코드를 제출하면 AST 신호를 바탕으로 질문 분기가 결정됩니다.",
+      "interview": "AI 면접관은 복잡도와 슬라이딩 윈도우 불변식을 중심으로 꼬리질문을 이어갑니다.",
+      "report": "마지막에는 정의, 해결, 설명의 3축 피드백 리포트가 생성됩니다."
+    },
+    "answers": [
+      "현재 풀이는 left마다 right를 다시 훑어서 최악의 경우 O(N^2)입니다. nums가 모두 양수라서 구간 합이 오른쪽으로 갈수록 커지므로, right를 뒤로 되돌릴 필요가 없습니다.",
+      "합이 target 이상이 되면 그 시점의 길이를 기록하고 left를 줄여 더 짧은 후보를 확인합니다. 양수 배열이라 left를 줄이면 합이 감소해서 윈도우 불변식을 유지할 수 있습니다.",
+      "핵심 상태는 현재 구간 합과 left, right입니다. 두 포인터가 각각 배열을 한 번씩만 지나가므로 전체 시간복잡도는 O(N)입니다.",
+      "다시 제출한다면 모든 시작점마다 탐색하는 구조를 없애고, 조건을 만족하는 동안만 shrink 하는 슬라이딩 윈도우 구조로 바꾸겠습니다."
+    ]
+  },
+  "outro": {
+    "title": "현재 시연 범위",
+    "subtitle": "코어 워크스페이스를 먼저 증명하고, 이후 학습자 경험과 기관 운영 레이어를 확장합니다.",
+    "details": [
+      "이미 증명한 것: 코드 기반 질문 분기, 질문 통제, 3축 피드백",
+      "실서비스 확장: 문제 탐색, 세션 히스토리, 학습자 성장 추적, 기관 대시보드"
+    ],
+    "holdMs": 2400
+  }
+}

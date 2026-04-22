@@ -14,6 +14,10 @@
     "verify": "npm run verify:web && npm run verify:api",
     "qa:install": "npm --workspace apps/web run qa:install",
     "qa:e2e": "npm --workspace apps/web run qa:e2e",
-    "qa": "npm run verify && npm run qa:e2e"
+    "qa": "npm run verify && npm run qa:e2e",
+    "video:check": "node tools/competition-video/check.mjs",
+    "video:record": "node tools/competition-video/record.mjs",
+    "video:compose": "node tools/competition-video/compose.mjs",
+    "video:competition": "node tools/competition-video/competition.mjs"
   }
 }
