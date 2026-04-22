@@ -31,6 +31,30 @@ Read these when the task touches proposal or planning documents:
 - `.codex/workflows/docs-authoring.md`
 - `.codex/checklists/proposal-review.md`
 
+## Agent Skills Mapping
+
+The `addyosmani/agent-skills` pack is installed in this workspace under `.codex/skills`.
+Use it as Codex-native workflow guidance, not as Claude-only metadata.
+
+- Treat `skills/` as the primary integration surface. When a task clearly matches one of those skills, open the relevant `SKILL.md` and follow it.
+- Do not assume `.claude/commands/` are executable in Codex. They are intent labels for Claude Code, not native Codex slash commands.
+- Interpret the command names as workflow triggers in Codex:
+  - `spec` -> `spec-driven-development`
+  - `plan` -> `planning-and-task-breakdown`
+  - `build` -> `incremental-implementation` + `test-driven-development`
+  - `test` -> `test-driven-development`
+  - `review` -> `code-review-and-quality`
+  - `ship` -> `shipping-and-launch`
+- Prefer adding the matching skill workflow to the current task rather than echoing command names back to the user.
+- Treat `agents/` as reusable review personas and role prompts, not as automatically executable Codex sub-agents. They may inform local reasoning or spawned sub-agents when delegation is explicitly appropriate, but they are not a 1:1 runtime mapping.
+- Treat `hooks/` as tool-specific lifecycle integration examples. Do not assume they are portable to this repository's Codex hook system without explicit adaptation.
+- When a task is non-trivial and no clearer repository-specific rule overrides it, default to this sequence:
+  - `spec-driven-development`
+  - `planning-and-task-breakdown`
+  - `incremental-implementation`
+  - `test-driven-development`
+  - `code-review-and-quality`
+
 ## Project-Specific Rules
 
 - Prioritize product and architecture coherence over speculative implementation.
