@@ -33,6 +33,24 @@ const operatingCostBars = [
 
 const controlHighlights = ["Fact", "Trap", "Follow-up Goal", "Forbidden Boundary"] as const;
 
+const proofSteps = [
+  {
+    eyebrow: "Step 01",
+    title: "문제를 고른 뒤 코드를 제출합니다.",
+    detail: "같은 문제라도 AST 신호와 trap에 따라 질문 출발점이 달라집니다.",
+  },
+  {
+    eyebrow: "Step 02",
+    title: "질문은 통제 범위 안에서만 이어집니다.",
+    detail: "주제 이탈 없이 복잡도, 불변식, 개선 방향을 차례로 확인합니다.",
+  },
+  {
+    eyebrow: "Step 03",
+    title: "세션이 끝나면 3축 피드백으로 정리됩니다.",
+    detail: "정의, 해결, 설명 축에서 다음 연습 포인트까지 남깁니다.",
+  },
+] as const;
+
 export default function HomePage() {
   const featuredProblem = problemCatalog.find((problem) => problem.flagship) ?? problemCatalog[0];
 
@@ -48,25 +66,29 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <section className="service-home-grid">
-        <article className="card service-hero-card">
-          <div className="service-hero-head">
-            <div className="service-hero-copy">
-              <div className="eyebrow">대표 증명 시나리오</div>
-              <h1>{featuredProblem.title}</h1>
-              <p className="hero-copy">
-                같은 문제에 세 가지 코드를 넣어 질문과 피드백이 어떻게 달라지는지
-                증명합니다. 핵심은 AI와 대화하는 장면이 아니라, 코드 신호에 따라 질문
-                흐름이 통제되고 그 근거를 역추적할 수 있다는 점입니다.
-              </p>
-            </div>
+      <section className="service-home-hero">
+        <article className="service-home-intro">
+          <div className="eyebrow">대표 증명 시나리오</div>
+          <h1 className="service-home-title">
+            <span>코드 신호에 따라</span>
+            <span>질문 흐름이</span>
+            <span>달라집니다.</span>
+          </h1>
+          <p className="hero-copy">
+            이 제품이 보여줘야 하는 것은 AI와 대화하는 장면 자체가 아닙니다. 코드에서
+            잡힌 신호가 질문 흐름을 어떻게 통제하고, 마지막에 어떤 피드백으로 정리되는지를
+            짧은 장면 안에서 설득력 있게 보여주는 것이 핵심입니다.
+          </p>
 
-            <div className="service-hero-badges">
+          <div className="service-home-featured">
+            <div className="service-featured-meta">
               <span className={`difficulty-pill ${featuredProblem.difficulty}`}>
                 {DIFFICULTY_LABEL[featuredProblem.difficulty]}
               </span>
               <span className="pill">{featuredProblem.pattern}</span>
             </div>
+            <h2>{featuredProblem.title}</h2>
+            <p>{featuredProblem.elevatorPitch}</p>
           </div>
 
           <div className="service-home-actions">
@@ -78,9 +100,9 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="service-metric-row">
+          <div className="service-proof-strip" aria-label="핵심 증거">
             {homeMetrics.map((metric) => (
-              <div key={metric.label} className="service-metric-card">
+              <div key={metric.label} className="service-proof-item">
                 <span className="eyebrow">{metric.label}</span>
                 <strong>{metric.value}</strong>
                 <span>{metric.note}</span>
@@ -89,34 +111,14 @@ export default function HomePage() {
           </div>
         </article>
 
-        <div className="service-side-column">
-          <article className="card service-summary-card">
-            <div className="service-summary-header">
-              <div className="eyebrow">기관 운영 비교</div>
-              <h2>강사 1인 30명 = 15시간 vs API $3</h2>
-              <p className="muted">
-                부트캠프 한 기수(30명) 모의 기술면접을 강사가 직접 운영하면 약 15시간이
-                필요합니다. 본 시스템은 동일 규모를 세션당 $0.10의 API 비용으로 처리해
-                운영 비용을 97% 이상 절감합니다.
-              </p>
-            </div>
-
-            <ul className="service-score-list">
-              {operatingCostBars.map((bar) => (
-                <li key={bar.label}>
-                  <span>{bar.label}</span>
-                  <div className="service-score-bar" aria-hidden="true">
-                    <span style={{ width: `${bar.percent}%` }} />
-                  </div>
-                  <strong>{bar.unit}</strong>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="card service-quick-card">
+        <aside className="service-demo-rail">
+          <div className="service-demo-card">
             <div className="eyebrow">질문 통제 구조</div>
             <h2>왜 주제 이탈 없이 질문이 이어지는가</h2>
+            <p className="muted">
+              질문은 문제별 근거 범위를 벗어나지 않습니다. 따라서 모든 질문은 코드 신호와
+              문제 기준으로 다시 추적할 수 있습니다.
+            </p>
             <div className="service-feature-tags">
               {controlHighlights.map((item) => (
                 <span key={item} className="pill">
@@ -124,17 +126,56 @@ export default function HomePage() {
                 </span>
               ))}
             </div>
-            <div className="service-signal-strip">
-              {(featuredProblem.comparisonPreview ?? []).map((preview) => (
-                <div key={preview.label} className="service-signal-card">
-                  <span className="eyebrow">{preview.label}</span>
-                  <strong>{preview.expectedFlow}</strong>
-                  <small>{preview.signal}</small>
+          </div>
+
+          <div className="service-demo-list">
+            {(featuredProblem.comparisonPreview ?? []).map((preview) => (
+              <div key={preview.label} className="service-demo-step">
+                <span className="eyebrow">{preview.label}</span>
+                <strong>{preview.expectedFlow}</strong>
+                <p>{preview.purpose}</p>
+                <small>{preview.signal}</small>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </section>
+
+      <section className="service-proof-band">
+        <article className="card service-proof-card">
+          <div className="eyebrow">기관 운영 비교</div>
+          <h2>강사 1인 30명 = 15시간 vs API $3</h2>
+          <p className="muted">
+            사업성 수치는 보조 증거로만 배치합니다. 먼저 데모 흐름을 이해한 뒤, 같은 세션을
+            훨씬 낮은 운영 비용으로 반복할 수 있다는 점을 뒷받침합니다.
+          </p>
+
+          <ul className="service-score-list">
+            {operatingCostBars.map((bar) => (
+              <li key={bar.label}>
+                <span>{bar.label}</span>
+                <div className="service-score-bar" aria-hidden="true">
+                  <span style={{ width: `${bar.percent}%` }} />
                 </div>
-              ))}
-            </div>
-          </article>
-        </div>
+                <strong>{bar.unit}</strong>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <article className="card service-proof-card">
+          <div className="eyebrow">대표 시연에서 바로 보이는 것</div>
+          <h2>첫 화면에서 이해해야 하는 메시지</h2>
+          <div className="service-proof-list">
+            {proofSteps.map((step) => (
+              <div key={step.title} className="service-proof-step">
+                <span className="eyebrow">{step.eyebrow}</span>
+                <strong>{step.title}</strong>
+                <p>{step.detail}</p>
+              </div>
+            ))}
+          </div>
+        </article>
       </section>
 
       <section id="practice-problems" className="service-problem-shelf">

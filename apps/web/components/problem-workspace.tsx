@@ -385,36 +385,38 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
     );
   }
 
-  const proofMeta = [
+  const sessionRail = [
     {
       title: "질문 흐름",
       value: session.branch_decision
         ? FLOW_META[session.branch_decision.flow_type].label
         : "코드 제출 대기",
-      description:
+      detail:
         session.branch_decision?.primary_signal ??
         "코드를 제출하면 코드 신호를 분석해 질문 방식이 자동으로 결정됩니다.",
     },
     {
-      title: "AI 면접관",
+      title: "질문 엔진",
       value: MODE_LABEL[session.question_mode],
-      description:
-        "코드에서 발견된 신호를 근거로 질문을 생성합니다. 근거 없는 질문은 하지 않습니다.",
+      detail: "코드에서 발견된 신호를 근거로 질문을 생성합니다.",
     },
     {
-      title: "피드백 준비",
+      title: "리포트 엔진",
       value: MODE_LABEL[session.report_mode],
-      description:
-        "면접이 끝나면 정의·해결·설명 3가지 기준으로 피드백이 생성됩니다.",
+      detail: "세션이 끝나면 정의·해결·설명 3축 피드백으로 정리됩니다.",
     },
-  ];
+  ] as const;
+
+  const previewFacts = problem.facts.slice(0, 2);
+  const previewBoundaries = problem.forbidden_boundaries.slice(0, 2);
 
   return (
     <div className="workspace">
-      <section className="card workspace-hero">
-        <div className="workspace-hero-copy">
+      <section className="card workspace-stage-hero">
+        <div className="workspace-stage-copy">
           <div className="eyebrow">{problem.pattern}</div>
           <h1>{problem.title}</h1>
+          <p className="workspace-stage-lead">{problem.elevator_pitch}</p>
           <p className="muted">{problem.prompt}</p>
           <div className="pill-row overview-row">
             <span className={`difficulty-pill ${problem.difficulty}`}>
@@ -433,38 +435,47 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           </ul>
         </div>
 
-        <aside className="workspace-brief">
-          <div className="brief-block">
-            <div className="eyebrow">이 문제에서 보게 될 것</div>
-            <p>{problem.elevator_pitch}</p>
-          </div>
-          <div className="brief-block">
-            <div className="eyebrow">질문이 참고하는 기준</div>
-            <ul className="mini-list">
-              {problem.facts.map((fact) => (
-                <li key={fact}>{fact}</li>
+        <aside className="workspace-stage-sidebar">
+          <div className="workspace-rail-block workspace-rail-primary">
+            <div className="eyebrow">세션 브리프</div>
+            <h2>{activeFlow?.label ?? "코드 제출 대기"}</h2>
+            <p className="muted">
+              {session.branch_decision?.primary_signal ??
+                "코드를 제출하면 인터뷰 흐름과 피드백 방식이 정해집니다."}
+            </p>
+            <div className="workspace-proof-list">
+              {sessionRail.map((item) => (
+                <div key={item.title} className="workspace-proof-item">
+                  <span className="eyebrow">{item.title}</span>
+                  <strong>{item.value}</strong>
+                  <small>{item.detail}</small>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
-          <div className="brief-block">
-            <div className="eyebrow">질문이 벗어나지 않는 범위</div>
-            <ul className="mini-list">
-              {problem.forbidden_boundaries.map((boundary) => (
-                <li key={boundary}>{boundary}</li>
-              ))}
-            </ul>
+
+          <div className="workspace-rail-block">
+            <div className="eyebrow">질문이 참고하는 범위</div>
+            <div className="workspace-rail-columns">
+              <div>
+                <strong>Fact</strong>
+                <ul className="mini-list">
+                  {previewFacts.map((fact) => (
+                    <li key={fact}>{fact}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <strong>Boundary</strong>
+                <ul className="mini-list">
+                  {previewBoundaries.map((boundary) => (
+                    <li key={boundary}>{boundary}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </aside>
-      </section>
-
-      <section className="analysis-grid">
-        {proofMeta.map((card) => (
-          <article key={card.title} className="card analysis-card compact">
-            <div className="eyebrow">{card.title}</div>
-            <h2>{card.value}</h2>
-            <p className="muted">{card.description}</p>
-          </article>
-        ))}
       </section>
 
       {session.ast_profile && session.branch_decision && activeFlow ? (
@@ -532,9 +543,10 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               {submitting ? "제출 중..." : "코드 제출"}
             </button>
           </div>
+
           <p className="panel-copy">
             대표 문제에서는 같은 문제에 다른 코드를 넣었을 때 질문 흐름이 어떻게 달라지는지를
-            보여주는 것이 핵심입니다.
+            짧고 선명하게 보여주는 것이 핵심입니다.
           </p>
 
           {problem.demo_variants.length > 0 ? (
@@ -551,9 +563,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                   >
                     <div className="variant-card-head">
                       <span className="eyebrow">{variant.label}</span>
-                      {isRecommended && (
+                      {isRecommended ? (
                         <span className="variant-recommended-badge">여기서 시작</span>
-                      )}
+                      ) : null}
                     </div>
                     <strong>{FLOW_META[variant.expected_flow].label}</strong>
                     <span>{variant.purpose}</span>
@@ -579,7 +591,11 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className="judge-box">
               <div className="judge-head">
                 <strong>{session.judge_result.status}</strong>
-                <span className={`mode-chip ${session.judge_result.passed ? "success" : "warning"}`}>
+                <span
+                  className={`mode-chip ${
+                    session.judge_result.passed ? "success" : "warning"
+                  }`}
+                >
                   {EXECUTION_MODE_LABEL[session.judge_result.mode]}
                 </span>
               </div>
@@ -592,121 +608,123 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           ) : null}
         </div>
 
-        <div className="card interview-panel">
-          <div className="panel-header">
-            <div>
-              <div className="eyebrow">질문 시연</div>
-              <h2>코드 근거 기반 면접 시연</h2>
-            </div>
-            <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
-          </div>
-
-          <div className={`flow-banner ${session.flow_type ?? "idle"}`}>
-            <div className="flow-banner-head">
-              <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
-              {session.question_mode === "deterministic" ? (
-                <span className="mode-chip deterministic">
-                  규칙 기반 질문 (시연 안정성 모드)
-                </span>
-              ) : null}
-            </div>
-            <p>
-              {session.branch_decision?.primary_signal ??
-                "코드를 제출하면 코드 신호를 기준으로 질문 흐름이 자동 선택됩니다."}
-            </p>
-          </div>
-
-          <div ref={chatLogRef} className="chat-log">
-            {session.turns.length === 0 ? (
-              <p className="muted">코드를 제출하면 면접관이 첫 질문을 시작합니다.</p>
-            ) : (
-              session.turns.map((turn) => (
-                <div key={turn.id} className={`message ${turn.role}`}>
-                  <div className="message-role">{turn.role === "assistant" ? "AI 면접관" : "내 답변"}</div>
-                  <div>{turn.content}</div>
-                  {turn.role === "assistant" && turn.intent ? (
-                    <div className="message-intent">{turn.intent}</div>
-                  ) : null}
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="answer-box">
-            <div className="answer-guide">
-              <span>이번 답변에 담아보세요</span>
-              <div className="answer-pill-row">
-                <span className="pill muted-pill">접근</span>
-                <span className="pill muted-pill">복잡도</span>
-                <span className="pill muted-pill">불변식</span>
-                <span className="pill muted-pill">트레이드오프</span>
+        <div className="workspace-interview-column">
+          <div className="card interview-panel">
+            <div className="panel-header">
+              <div>
+                <div className="eyebrow">질문 시연</div>
+                <h2>코드 근거 기반 면접 시연</h2>
               </div>
+              <span className={`status-chip ${statusMeta.tone}`}>{statusMeta.label}</span>
             </div>
-            <textarea
-              value={answer}
-              onChange={(event) => setAnswer(event.target.value)}
-              placeholder="풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요."
-              rows={5}
-              disabled={session.status === "completed" || submitting || !session.current_question}
-            />
-            <button
-              className="primary"
-              onClick={handleSendAnswer}
-              disabled={submitting || recoveringReport || !session.current_question}
-            >
-              {submitting ? "전송 중..." : "답변 보내기"}
-            </button>
-          </div>
-        </div>
 
-        <div className="card evidence-panel">
-          <div className="panel-header">
-            <div>
-              <div className="eyebrow">질문 근거</div>
-              <h2>왜 이런 질문이 나왔는지</h2>
-            </div>
-          </div>
-
-          <div className="evidence-stack">
-            <div className="evidence-block">
-              <div className="eyebrow">이번 턴의 확인 포인트</div>
-              <strong>{latestAssistantTurn?.intent ?? "코드 제출 전"}</strong>
-              <p className="muted">
-                {latestAssistantTurn?.guardrail_note ??
-                  "첫 질문이 시작되면 질문 근거와 제한 범위가 함께 표시됩니다."}
+            <div className={`flow-banner ${session.flow_type ?? "idle"}`}>
+              <div className="flow-banner-head">
+                <strong>{activeFlow?.label ?? "코드 제출 대기"}</strong>
+                {session.question_mode === "deterministic" ? (
+                  <span className="mode-chip deterministic">규칙 기반 질문 (시연 안정성 모드)</span>
+                ) : null}
+              </div>
+              <p>
+                {session.branch_decision?.primary_signal ??
+                  "코드를 제출하면 코드 신호를 기준으로 질문 흐름이 자동 선택됩니다."}
               </p>
             </div>
 
-            <div className="evidence-block">
-              <div className="eyebrow">지금 쓰인 근거</div>
-              {latestAssistantTurn?.evidence_refs.length ? (
-                <ul className="evidence-list">
-                  {latestAssistantTurn.evidence_refs.map((ref) => (
-                    <li key={`${ref.kind}-${ref.label}-${ref.detail}`}>
-                      <span className={`evidence-tag ${ref.kind}`}>{EVIDENCE_LABEL[ref.kind]}</span>
-                      <div>
-                        <strong>{ref.label}</strong>
-                        <p>{ref.detail}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+            <div ref={chatLogRef} className="chat-log">
+              {session.turns.length === 0 ? (
+                <p className="muted">코드를 제출하면 면접관이 첫 질문을 시작합니다.</p>
               ) : (
-                <p className="muted">코드를 제출하면 턴별 질문 근거가 여기에 표시됩니다.</p>
+                session.turns.map((turn) => (
+                  <div key={turn.id} className={`message ${turn.role}`}>
+                    <div className="message-role">
+                      {turn.role === "assistant" ? "AI 면접관" : "내 답변"}
+                    </div>
+                    <div>{turn.content}</div>
+                    {turn.role === "assistant" && turn.intent ? (
+                      <div className="message-intent">{turn.intent}</div>
+                    ) : null}
+                  </div>
+                ))
               )}
             </div>
 
-            {session.ast_profile ? (
-              <div className="evidence-block">
-                <div className="eyebrow">코드 분석 요약</div>
-                <ul className="mini-list">
-                  <li>파싱 성공: {String(session.ast_profile.parse_ok)}</li>
-                  <li>중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
-                  <li>순환 복잡도: {session.ast_profile.cyclomatic_complexity}</li>
-                  <li>위험 연산: {session.ast_profile.has_risky_ops.join(", ") || "없음"}</li>
-                </ul>
+            <div className="answer-box">
+              <div className="answer-guide">
+                <span>이번 답변에 담아보세요</span>
+                <div className="answer-pill-row">
+                  <span className="pill muted-pill">접근</span>
+                  <span className="pill muted-pill">복잡도</span>
+                  <span className="pill muted-pill">불변식</span>
+                  <span className="pill muted-pill">트레이드오프</span>
+                </div>
               </div>
-            ) : null}
+              <textarea
+                value={answer}
+                onChange={(event) => setAnswer(event.target.value)}
+                placeholder="풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요."
+                rows={5}
+                disabled={session.status === "completed" || submitting || !session.current_question}
+              />
+              <button
+                className="primary"
+                onClick={handleSendAnswer}
+                disabled={submitting || recoveringReport || !session.current_question}
+              >
+                {submitting ? "전송 중..." : "답변 보내기"}
+              </button>
+            </div>
+          </div>
+
+          <div className="card evidence-panel">
+            <div className="panel-header">
+              <div>
+                <div className="eyebrow">질문 근거</div>
+                <h2>왜 이런 질문이 나왔는지</h2>
+              </div>
+            </div>
+
+            <div className="evidence-stack">
+              <div className="evidence-block">
+                <div className="eyebrow">이번 턴의 확인 포인트</div>
+                <strong>{latestAssistantTurn?.intent ?? "코드 제출 전"}</strong>
+                <p className="muted">
+                  {latestAssistantTurn?.guardrail_note ??
+                    "첫 질문이 시작되면 질문 근거와 제한 범위가 함께 표시됩니다."}
+                </p>
+              </div>
+
+              <div className="evidence-block">
+                <div className="eyebrow">지금 쓰인 근거</div>
+                {latestAssistantTurn?.evidence_refs.length ? (
+                  <ul className="evidence-list">
+                    {latestAssistantTurn.evidence_refs.map((ref) => (
+                      <li key={`${ref.kind}-${ref.label}-${ref.detail}`}>
+                        <span className={`evidence-tag ${ref.kind}`}>{EVIDENCE_LABEL[ref.kind]}</span>
+                        <div>
+                          <strong>{ref.label}</strong>
+                          <p>{ref.detail}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="muted">코드를 제출하면 턴별 질문 근거가 여기에 표시됩니다.</p>
+                )}
+              </div>
+
+              {session.ast_profile ? (
+                <div className="evidence-block">
+                  <div className="eyebrow">코드 분석 요약</div>
+                  <ul className="mini-list">
+                    <li>파싱 성공: {String(session.ast_profile.parse_ok)}</li>
+                    <li>중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
+                    <li>순환 복잡도: {session.ast_profile.cyclomatic_complexity}</li>
+                    <li>위험 연산: {session.ast_profile.has_risky_ops.join(", ") || "없음"}</li>
+                  </ul>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
@@ -729,11 +747,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 <small>주제 이탈 · 근거 없음 · 검수 불가</small>
               </header>
               <ul>
-                {CONTROL_COMPARISON[session.branch_decision.flow_type].generic.map(
-                  (question) => (
-                    <li key={question}>{question}</li>
-                  ),
-                )}
+                {CONTROL_COMPARISON[session.branch_decision.flow_type].generic.map((question) => (
+                  <li key={question}>{question}</li>
+                ))}
               </ul>
             </article>
             <article className="compare-column controlled">
@@ -742,19 +758,17 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 <small>Fact/Trap 범위 내 · 근거 명시 · 재현 가능</small>
               </header>
               <ul>
-                {CONTROL_COMPARISON[session.branch_decision.flow_type].controlled.map(
-                  (example) => (
-                    <li key={example.question}>
-                      <strong>{example.question}</strong>
-                      <div className="compare-evidence-row">
-                        <span className={`evidence-tag ${example.kind}`}>
-                          {EVIDENCE_LABEL[example.kind]}
-                        </span>
-                        <small>{example.source}</small>
-                      </div>
-                    </li>
-                  ),
-                )}
+                {CONTROL_COMPARISON[session.branch_decision.flow_type].controlled.map((example) => (
+                  <li key={example.question}>
+                    <strong>{example.question}</strong>
+                    <div className="compare-evidence-row">
+                      <span className={`evidence-tag ${example.kind}`}>
+                        {EVIDENCE_LABEL[example.kind]}
+                      </span>
+                      <small>{example.source}</small>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </article>
           </div>
