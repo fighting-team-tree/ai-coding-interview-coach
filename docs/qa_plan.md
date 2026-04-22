@@ -6,7 +6,7 @@
 
 ## 실행 명령
 - `npm run verify`: 웹/백엔드 정적 검증과 단위 테스트 실행
-- `npm run qa:e2e`: QA 전용 빌드 후 Playwright로 브라우저 기준 핵심 흐름 검증
+- `npm run qa:e2e`: 프로덕션 빌드(`next build`) 후 Playwright로 브라우저 기준 핵심 흐름 검증
 - `npm run qa`: `verify` 후 `qa:e2e`까지 한 번에 실행
 - `npm run qa:install`: Playwright Chromium 브라우저 1회 설치
 
@@ -16,7 +16,7 @@
 3. 답변 4턴 이후 리포트와 3축 피드백이 노출되는지 확인
 
 ## 서버 기동 방식
-- API는 `uv run uvicorn`으로 `127.0.0.1:8100`에서 기동
+- API는 `uv run uvicorn`으로 `127.0.0.1:8110`에서 기동
 - 웹은 QA 전용 빌드 산출물을 기준으로 `127.0.0.1:3100`에서 정적 서버로 기동
 - E2E는 개발 서버가 아니라 빌드 결과를 검증 대상으로 삼는다
 
@@ -29,3 +29,7 @@
 - 핵심 화면, API 연동, 사용자 흐름을 건드렸다면 `npm run qa`까지 실행한다.
 - 자동 수정은 테스트 실패 원인이 명확하고 국소적인 경우에만 진행한다.
 - 구조 변경이나 멀티파일 기능 수정은 기존 승인-first 정책을 유지한다.
+
+## 2026-04-23 기준 상태
+- `npm run verify`는 통과한다.
+- `npm run qa:e2e`도 프로덕션 빌드 기준으로 통과해야 하며, 실패 시 `qa:build` 경로와 Playwright 서버 포트 설정부터 먼저 점검한다.
