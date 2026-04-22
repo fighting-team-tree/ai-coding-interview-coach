@@ -80,6 +80,7 @@ tmp/
 .bkit/
 docs/.bkit-memory.json
 docs/.pdca-status.json
+docs/.pdca-snapshots/
 
 # Local Playwright inspection artifacts
 .playwright-mcp/
