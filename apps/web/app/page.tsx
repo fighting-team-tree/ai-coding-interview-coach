@@ -22,14 +22,14 @@ const homeMetrics = [
   {
     label: "결과물",
     value: "3축 피드백",
-    note: "논리 구조, 기술 정확도, 설명 명료도 요약 제공",
+    note: "정의, 해결, 설명 3축 요약 제공",
   },
 ] as const;
 
 const recentFeedbackAxes = [
-  { label: "논리 구조", score: 7.8 },
-  { label: "기술 정확도", score: 7.2 },
-  { label: "설명 명료도", score: 6.9 },
+  { label: "정의", score: 7.8 },
+  { label: "해결", score: 7.2 },
+  { label: "설명", score: 6.9 },
 ] as const;
 
 const practiceHighlights = ["코드 제출", "꼬리 질문", "3축 피드백"] as const;
@@ -93,10 +93,10 @@ export default function HomePage() {
           <article className="card service-summary-card">
             <div className="service-summary-header">
               <div className="eyebrow">샘플 피드백 미리보기</div>
-              <h2>설명 명료도를 먼저 끌어올릴 차례입니다</h2>
+              <h2>설명을 먼저 끌어올릴 차례입니다</h2>
               <p className="muted">
-                직접 풀이를 제출하면 이런 형태의 3축 피드백을 받을 수 있습니다. 논리 구조,
-                기술 정확도, 설명 명료도 각각 점수와 다음 액션이 제공됩니다.
+                직접 풀이를 제출하면 이런 형태의 3축 피드백을 받을 수 있습니다. 정의,
+                해결, 설명 각각 점수와 다음 액션이 제공됩니다.
               </p>
             </div>
 

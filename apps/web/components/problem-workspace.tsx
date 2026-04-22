@@ -146,9 +146,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const statusMeta = session ? STATUS_META[session.status] : STATUS_META.created;
   const reportAxes = report
     ? [
-        { label: "논리 구조", axis: report.logical_structure },
-        { label: "기술 정확도", axis: report.technical_accuracy },
-        { label: "설명 명료도", axis: report.explanation_clarity },
+        { label: "정의", axis: report.logical_structure },
+        { label: "해결", axis: report.technical_accuracy },
+        { label: "설명", axis: report.explanation_clarity },
       ]
     : [];
   const reportAverage = reportAxes.length
@@ -296,7 +296,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       title: "피드백 준비",
       value: MODE_LABEL[session.report_mode],
       description:
-        "면접이 끝나면 논리 구조·기술 정확도·설명 명료도 3가지 기준으로 피드백이 생성됩니다.",
+        "면접이 끝나면 정의·해결·설명 3가지 기준으로 피드백이 생성됩니다.",
     },
   ];
 

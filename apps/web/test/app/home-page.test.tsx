@@ -21,7 +21,7 @@ describe("HomePage", () => {
     expect(
       screen.getAllByRole("heading", { name: problemCatalog[0].title }).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole("heading", { name: "설명 명료도를 먼저 끌어올릴 차례입니다" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "설명을 먼저 끌어올릴 차례입니다" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "설명 면접을 바로 시작할 문제를 고르세요" })).toBeInTheDocument();
     expect(screen.getByText("오늘의 추천 인터뷰")).toBeInTheDocument();
     expect(screen.getByText("샘플 피드백 미리보기")).toBeInTheDocument();

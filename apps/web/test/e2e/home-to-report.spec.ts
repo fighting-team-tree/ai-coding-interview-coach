@@ -18,7 +18,7 @@ test("대표 문제에서 코드 제출부터 3축 리포트까지 완료한다"
   await completeInterviewFlow(page);
 
   await expect(page.getByText("Fallback report generated from transcript heuristics")).toBeVisible();
-  await expect(page.getByText("논리 구조", { exact: true })).toBeVisible();
-  await expect(page.getByText("기술 정확도", { exact: true })).toBeVisible();
-  await expect(page.getByText("설명 명료도", { exact: true })).toBeVisible();
+  await expect(page.getByText("정의", { exact: true })).toBeVisible();
+  await expect(page.getByText("해결", { exact: true })).toBeVisible();
+  await expect(page.getByText("설명", { exact: true })).toBeVisible();
 });
