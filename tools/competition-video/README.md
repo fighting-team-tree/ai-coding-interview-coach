@@ -48,6 +48,8 @@ output/competition-video/<scenario>/<timestamp>/
 
 시나리오는 `tools/competition-video/scenarios/*.json`에 둡니다.
 
+제출용 시나리오는 `2분 40초 ~ 2분 55초` 정도를 목표로 잡는 것을 권장합니다. 너무 짧으면 흐름이 급해지고, 3분을 넘기면 제출 리스크가 커집니다.
+
 주요 필드:
 
 - `viewport`
@@ -56,9 +58,18 @@ output/competition-video/<scenario>/<timestamp>/
 - `demo.variantLabel`
 - `demo.answers`
 - `demo.captions`
+- `demo.captions.interviewIntro`
+- `demo.turnCaptions`
+- `demo.holds.beforeFirstAnswerMs`
+- `demo.holds.afterTurnMs`
+- `demo.holds.beforeReportMs`
 - `outro`
 
-새 대회를 준비할 때는 기존 시나리오를 복사해 텍스트, 문제 경로, 답변 세트만 바꾸면 됩니다.
+`turnCaptions`는 `answers`와 길이를 맞춰 각 턴마다 다른 자막을 노출할 때 사용합니다. 미지정 시 기존 `demo.captions.interview`를 모든 턴에 재사용합니다.
+
+녹화 스크립트는 코드 제출 직후, 각 답변 전송 직후, 리포트 진입 직후에 인터뷰 패널과 채팅 로그를 다시 보이도록 스크롤을 보정합니다. 제출용 촬영에서는 이 방어 로직을 유지하는 편이 안전합니다.
+
+새 대회를 준비할 때는 기존 시나리오를 복사해 텍스트, 문제 경로, 답변 세트, 타이밍만 바꾸면 됩니다.
 
 ## 의존성
 

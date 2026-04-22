@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Editor from "@monaco-editor/react";
 
@@ -177,6 +177,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   const [recoveringReport, setRecoveringReport] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
+  const chatLogRef = useRef<HTMLDivElement | null>(null);
+  const lastAssistantTurnIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -250,6 +252,27 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
   function retryBootstrap() {
     setReloadToken((current) => current + 1);
   }
+
+  useEffect(() => {
+    lastAssistantTurnIdRef.current = null;
+  }, [session?.id]);
+
+  useEffect(() => {
+    if (!latestAssistantTurn) {
+      return;
+    }
+
+    if (latestAssistantTurn.id === lastAssistantTurnIdRef.current) {
+      return;
+    }
+
+    const behavior = lastAssistantTurnIdRef.current ? "smooth" : "auto";
+    lastAssistantTurnIdRef.current = latestAssistantTurn.id;
+    chatLogRef.current?.scrollTo({
+      top: chatLogRef.current.scrollHeight,
+      behavior,
+    });
+  }, [latestAssistantTurn]);
 
   function handleLoadVariant(variantId: string) {
     if (!problem) {
@@ -593,7 +616,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             </p>
           </div>
 
-          <div className="chat-log">
+          <div ref={chatLogRef} className="chat-log">
             {session.turns.length === 0 ? (
               <p className="muted">코드를 제출하면 면접관이 첫 질문을 시작합니다.</p>
             ) : (

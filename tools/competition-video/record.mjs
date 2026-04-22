@@ -190,6 +190,25 @@ async function typeAnswerSlowly(page, locator, answer, delay) {
   await page.keyboard.type(answer, { delay });
 }
 
+async function revealInterviewState(page) {
+  const interviewPanel = page.locator(".interview-panel");
+  if (await interviewPanel.count()) {
+    await interviewPanel.scrollIntoViewIfNeeded();
+  }
+
+  const chatLog = page.locator(".chat-log");
+  if (await chatLog.count()) {
+    await chatLog.evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+    });
+  }
+}
+
+async function revealReportState(page) {
+  const reportHeading = page.getByRole("heading", { name: "3축 피드백" });
+  await reportHeading.scrollIntoViewIfNeeded();
+}
+
 async function recordDemoClip(browser, viewport, rawDir, scenario, baseUrl) {
   const context = await browser.newContext({
     viewport,
@@ -199,6 +218,15 @@ async function recordDemoClip(browser, viewport, rawDir, scenario, baseUrl) {
   const video = page.video();
 
   try {
+    const afterTurnMs =
+      scenario.demo.holds.afterTurnMs ?? scenario.demo.holds.betweenAnswerMs ?? 0;
+    const beforeFirstAnswerMs =
+      scenario.demo.holds.beforeFirstAnswerMs ?? scenario.demo.holds.betweenAnswerMs ?? 0;
+    const beforeReportMs = scenario.demo.holds.beforeReportMs ?? afterTurnMs;
+    const turnCaptions =
+      scenario.demo.turnCaptions ??
+      scenario.demo.answers.map(() => scenario.demo.captions.interview ?? "");
+
     await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
     await installCaptionOverlay(page);
 
@@ -226,16 +254,23 @@ async function recordDemoClip(browser, viewport, rawDir, scenario, baseUrl) {
 
     await page.getByRole("heading", { name: "일반 심화 질문" }).waitFor();
     await page.getByRole("heading", { name: "왜 이런 질문이 나왔는지" }).waitFor();
+    await revealInterviewState(page);
     await sleep(scenario.demo.holds.afterSubmitMs);
 
     const answerBox = page.getByPlaceholder(
       "풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요.",
     );
 
-    for (const answer of scenario.demo.answers) {
+    if (scenario.demo.captions.interviewIntro) {
+      await setCaption(page, scenario.demo.captions.interviewIntro);
+      await sleep(beforeFirstAnswerMs);
+    }
+
+    for (const [index, answer] of scenario.demo.answers.entries()) {
       await answerBox.waitFor();
+      await revealInterviewState(page);
       await answerBox.clear();
-      await setCaption(page, scenario.demo.captions.interview);
+      await setCaption(page, turnCaptions[index] ?? scenario.demo.captions.interview ?? "");
       await typeAnswerSlowly(page, answerBox, answer, scenario.demo.typingDelayMs);
 
       await Promise.all([
@@ -245,10 +280,12 @@ async function recordDemoClip(browser, viewport, rawDir, scenario, baseUrl) {
         page.getByRole("button", { name: "답변 보내기" }).click(),
       ]);
 
-      await sleep(scenario.demo.holds.betweenAnswerMs);
+      await revealInterviewState(page);
+      await sleep(index === scenario.demo.answers.length - 1 ? beforeReportMs : afterTurnMs);
     }
 
     await page.getByRole("heading", { name: "3축 피드백" }).waitFor({ timeout: 15_000 });
+    await revealReportState(page);
     await setCaption(page, scenario.demo.captions.report);
     await sleep(scenario.demo.holds.reportMs);
     await setCaption(page, "");
