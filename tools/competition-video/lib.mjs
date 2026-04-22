@@ -21,6 +21,13 @@ function resolveCommand(command) {
     }
   }
 
+  if (command === "ffprobe") {
+    const ffprobePath = resolveFfprobePath();
+    if (ffprobePath) {
+      return ffprobePath;
+    }
+  }
+
   if (process.platform !== "win32") {
     return command;
   }
@@ -72,8 +79,24 @@ function createSpawnConfig(command, args, options) {
 }
 
 function resolveFfmpegPath() {
+  return resolveFfBinaryPath("ffmpeg.exe");
+}
+
+function resolveFfprobePath() {
+  return resolveFfBinaryPath("ffprobe.exe");
+}
+
+function resolveFfBinaryPath(binaryName) {
   if (process.env.FFMPEG_PATH?.trim()) {
-    return process.env.FFMPEG_PATH.trim();
+    const ffmpegCandidate = process.env.FFMPEG_PATH.trim();
+    if (binaryName === "ffmpeg.exe") {
+      return ffmpegCandidate;
+    }
+
+    const siblingCandidate = path.join(path.dirname(ffmpegCandidate), binaryName);
+    if (fsSync.existsSync(siblingCandidate)) {
+      return siblingCandidate;
+    }
   }
 
   if (process.platform !== "win32") {
@@ -105,8 +128,8 @@ function resolveFfmpegPath() {
     return null;
   }
 
-  const ffmpegExe = path.join(ffmpegRoot, buildDir.name, "bin", "ffmpeg.exe");
-  return fsSync.existsSync(ffmpegExe) ? ffmpegExe : null;
+  const binaryPath = path.join(ffmpegRoot, buildDir.name, "bin", binaryName);
+  return fsSync.existsSync(binaryPath) ? binaryPath : null;
 }
 
 export function isMain(metaUrl) {
@@ -205,6 +228,42 @@ export async function runCommand(command, args, options = {}) {
   });
 }
 
+export async function runCommandCapture(command, args, options = {}) {
+  const { cwd = ROOT_DIR, env = process.env, label = command } = options;
+  const spawnConfig = createSpawnConfig(command, args, {
+    cwd,
+    env,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(spawnConfig.command, spawnConfig.args, spawnConfig.options);
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    child.on("error", (error) => {
+      reject(new Error(`${label} failed to start: ${error.message}`));
+    });
+
+    child.on("exit", (code) => {
+      if (code === 0) {
+        resolve({ stdout, stderr });
+        return;
+      }
+
+      reject(new Error(`${label} exited with code ${code ?? "unknown"}: ${stderr.trim()}`));
+    });
+  });
+}
+
 export function spawnLongLived(command, args, options = {}) {
   const { cwd = ROOT_DIR, env = process.env, stdio = "pipe" } = options;
   const spawnConfig = createSpawnConfig(command, args, {
@@ -266,6 +325,28 @@ export async function verifyCommand(command, args = ["-version"]) {
   });
 }
 
+export async function getMediaDurationMs(targetPath) {
+  const { stdout } = await runCommandCapture(
+    "ffprobe",
+    [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      targetPath,
+    ],
+    { label: "ffprobe duration" },
+  );
+  const seconds = Number.parseFloat(stdout.trim());
+  if (!Number.isFinite(seconds) || seconds <= 0) {
+    throw new Error(`Could not determine media duration for ${targetPath}`);
+  }
+
+  return Math.round(seconds * 1_000);
+}
+
 export async function loadChromium() {
   try {
     const playwright = await import("playwright");
@@ -319,6 +400,7 @@ export function withVideoEnvironment(baseEnv, mode) {
 
   return {
     ...baseEnv,
+    APP_ENV: "demo",
     FRONTEND_ORIGINS: "http://localhost:3100,http://127.0.0.1:3100",
     JUDGE0_BASE_URL: "",
     JUDGE0_API_TOKEN: "",

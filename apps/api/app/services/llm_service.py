@@ -98,7 +98,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
         question_plan: QuestionPlan,
     ) -> tuple[str, str]:
         settings = get_settings()
-        if Agent is None or not settings.interview_model:
+        if settings.is_demo_mode or Agent is None or not settings.interview_model:
             return question_plan.prompt, "deterministic"
 
         system_prompt, user_prompt = self._build_question_prompt(
@@ -129,7 +129,7 @@ Judge result: {session.judge_result.model_dump() if session.judge_result else {}
     ) -> tuple[FeedbackReport, str]:
         fallback = build_fallback_report(problem=problem, session=session)
         settings = get_settings()
-        if Agent is None or not settings.report_model:
+        if settings.is_demo_mode or Agent is None or not settings.report_model:
             return fallback, "deterministic"
 
         system_prompt, user_prompt = self._build_report_prompt(problem=problem, session=session)

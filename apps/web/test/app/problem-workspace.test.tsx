@@ -77,6 +77,9 @@ describe("ProblemWorkspace", () => {
     expect(screen.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeInTheDocument();
     expect(screen.getByText("positive numbers")).toBeInTheDocument();
     expect(screen.getByText("질문이 확인하는 기준")).toBeInTheDocument();
+    expect(screen.getByTestId("editor").closest("div")).toBeInTheDocument();
+    expect(document.querySelector("[data-video-interview-panel]")).not.toBeNull();
+    expect(document.querySelector("[data-video-chat-log]")).not.toBeNull();
     expect(screen.queryByText("기관 활용 포인트")).not.toBeInTheDocument();
   });
 
@@ -230,5 +233,6 @@ describe("ProblemWorkspace", () => {
       within(chatBubble as HTMLElement).getByText("지금 구현의 최악 시간복잡도를 수식으로 설명해 주세요."),
     ).toBeInTheDocument();
     expect(within(chatBubble as HTMLElement).queryByText("복잡도 확인")).not.toBeInTheDocument();
+    expect(document.querySelector("[data-video-chat-log]")).not.toBeNull();
   });
 });

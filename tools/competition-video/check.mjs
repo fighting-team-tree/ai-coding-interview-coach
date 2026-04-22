@@ -1,10 +1,29 @@
 import { API_DIR, ROOT_DIR, WEB_DIR, isMain, parseArgs, verifyChromium, verifyCommand } from "./lib.mjs";
+import { createMeloTtsInvocation } from "./render-audio.mjs";
 
 export async function checkCompetitionVideoEnvironment() {
   await verifyCommand("python", ["--version"]);
   await verifyCommand("uv", ["--version"]);
   await verifyCommand("ffmpeg", ["-version"]);
+  await verifyCommand("ffprobe", ["-version"]);
   await verifyCommand("npm", ["--version"]);
+  const invocation = createMeloTtsInvocation({
+    audioDir: ROOT_DIR,
+    cueSheet: {
+      audio: {
+        tts: {
+          engine: "melotts",
+          language: "KR",
+          speaker: "KR",
+          speed: 1,
+          device: "cpu",
+          pythonVersion: "3.10",
+        },
+      },
+    },
+    cues: [],
+  });
+  await verifyCommand(invocation.command, [...invocation.args.slice(0, -4), "python", "--version"]);
   await verifyChromium();
 
   return {

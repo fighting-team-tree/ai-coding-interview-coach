@@ -15,16 +15,20 @@ logger = logging.getLogger(__name__)
 class Judge0Client:
     def __init__(self) -> None:
         settings = get_settings()
+        self.demo_mode = settings.is_demo_mode
         self.base_url = settings.judge0_base_url.rstrip("/")
         self.api_token = settings.judge0_api_token
 
     async def execute_python(self, code: str) -> JudgeResult:
-        if not self.base_url:
+        if self.demo_mode or not self.base_url:
             return JudgeResult(
-                status="내장 실행 모드",
+                status="데모 실행 모드" if self.demo_mode else "내장 실행 모드",
                 passed=False,
                 stdout=(
-                    "이 환경에서는 실행 서버가 연결되어 있지 않아 "
+                    "데모 환경에서는 제출 코드를 실제 실행하지 않고 "
+                    "결정론적 시연 흐름만 사용합니다."
+                    if self.demo_mode
+                    else "이 환경에서는 실행 서버가 연결되어 있지 않아 "
                     "제출 코드를 실제로 실행하지 않았습니다."
                 ),
                 mode="demo",

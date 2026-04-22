@@ -7,22 +7,23 @@
     "height": 1080
   },
   "intro": {
-    "title": "Socratic Deep-Dive",
+    "title": "코드 신호에 따라 질문 흐름이 달라집니다.",
     "subtitle": "같은 문제라도 코드가 다르면 질문이 달라지는 통제형 기술면접 평가 시스템",
+    "ttsText": "코드 신호에 따라 질문 흐름이 달라집니다.",
     "details": [
       "같은 문제에서도 코드 구조에 따라 질문 흐름이 달라집니다.",
       "질문은 Fact, Trap, Forbidden Boundary 안에서 이어집니다."
     ],
-    "holdMs": 12000
+    "holdMs": 6500
   },
   "demo": {
     "problemPath": "/problems/two-pointer-window",
     "problemHeading": "연속 부분 수열의 최소 길이",
-    "ctaName": "대표 분기 시연 시작",
+    "ctaName": "대표 문제 시작하기",
     "variantLabel": "느린 풀이",
     "typingDelayMs": 60,
     "holds": {
-      "homeMs": 11000,
+      "homeMs": 8000,
       "problemMs": 15000,
       "variantMs": 8000,
       "afterSubmitMs": 15000,
@@ -32,12 +33,30 @@
       "reportMs": 22000
     },
     "captions": {
-      "home": "같은 문제에서도 코드에 따라 질문 흐름이 달라집니다.",
-      "problem": "코드 제출 이후, 질문 근거와 피드백이 한 화면에서 이어집니다.",
-      "variant": "중첩 반복문이 들어간 느린 풀이를 선택합니다.",
-      "submit": "코드를 제출하면 AST 신호와 문제 기준을 바탕으로 첫 질문이 정해집니다.",
-      "interviewIntro": "질문은 복잡도, 불변식, 개선 방향 순으로 이어집니다.",
-      "report": "세션이 끝나면 정의, 해결, 설명 기준의 피드백이 정리됩니다."
+      "home": {
+        "caption": "같은 문제에서도 코드에 따라 질문 흐름이 달라집니다.",
+        "ttsText": "같은 문제에서도 코드에 따라 질문 흐름이 달라집니다."
+      },
+      "problem": {
+        "caption": "코드 제출 이후, 질문 근거와 피드백이 한 화면에서 이어집니다.",
+        "ttsText": "코드 제출 이후, 질문 근거와 피드백이 한 화면에서 이어집니다."
+      },
+      "variant": {
+        "caption": "중첩 반복문이 들어간 느린 풀이를 선택합니다.",
+        "ttsText": "중첩 반복문이 들어간 느린 풀이를 선택합니다."
+      },
+      "submit": {
+        "caption": "코드를 제출하면 AST 신호와 문제 기준을 바탕으로 첫 질문이 정해집니다.",
+        "ttsText": "코드를 제출하면 첫 질문이 정해집니다."
+      },
+      "interviewIntro": {
+        "caption": "질문은 복잡도, 불변식, 개선 방향 순으로 이어집니다.",
+        "ttsText": "질문은 복잡도, 불변식, 개선 방향 순으로 이어집니다."
+      },
+      "report": {
+        "caption": "세션이 끝나면 정의, 해결, 설명 기준의 피드백이 정리됩니다.",
+        "ttsText": "세션이 끝나면 3축 피드백이 정리됩니다."
+      }
     },
     "turnCaptions": [
       "현재 풀이가 왜 O(N^2)인지, 그리고 왜 right를 되돌릴 필요가 없는지 설명합니다.",
@@ -52,9 +71,31 @@
       "다시 제출한다면 모든 시작점마다 탐색하는 구조를 없애고, 조건을 만족하는 동안만 shrink 하는 슬라이딩 윈도우 구조로 바꾸겠습니다."
     ]
   },
+  "audio": {
+    "tts": {
+      "engine": "melotts",
+      "language": "KR",
+      "speaker": "KR",
+      "speed": 1.0,
+      "device": "cpu",
+      "pythonVersion": "3.10",
+      "offsetMs": 380
+    },
+    "bgm": {
+      "assetPath": "tools/competition-video/assets/bgm/mixkit-opalescent-593.mp3",
+      "volume": 0.15,
+      "fadeInMs": 1600,
+      "fadeOutMs": 2200,
+      "duckingThreshold": 0.018,
+      "duckingRatio": 11,
+      "attackMs": 180,
+      "releaseMs": 680
+    }
+  },
   "outro": {
     "title": "질문에서 피드백까지",
     "subtitle": "코드 분석, 질문 흐름, 그리고 3축 피드백이 하나의 세션으로 이어집니다.",
+    "ttsText": "코드 분석에서 질문, 그리고 피드백까지 하나의 세션으로 이어집니다.",
     "details": [
       "코드 신호에 따라 질문 흐름이 달라집니다.",
       "세션이 끝나면 정의, 해결, 설명 기준의 피드백이 남습니다."

@@ -15,18 +15,25 @@ vi.mock("next/link", () => ({
 }));
 
 describe("HomePage", () => {
-  it("renders a service-style dashboard home instead of the old static preview", () => {
+  it("renders the immediate demo-entry home with a featured problem CTA", () => {
     render(<HomePage />);
 
     expect(
       screen.getAllByRole("heading", { name: problemCatalog[0].title }).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByRole("heading", { name: "코드 신호에 따라 질문 흐름이 달라집니다." }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "같은 흐름을 더 적은 운영 부담으로 반복합니다" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "같은 흐름으로 확인할 추가 문제" })).toBeInTheDocument();
     expect(screen.getByText("대표 시연")).toBeInTheDocument();
     expect(screen.getByText("운영 기준")).toBeInTheDocument();
     expect(screen.getByText("다른 연습 문제")).toBeInTheDocument();
     expect(screen.getByText(problemCatalog[1].title)).toBeInTheDocument();
+    const featuredProblemCtas = screen
+      .getAllByRole("link", { name: "대표 문제 시작하기" })
+      .filter((link) => link.getAttribute("data-video-cta") === "featured-problem");
+    expect(featuredProblemCtas.length).toBeGreaterThanOrEqual(1);
 
     expect(screen.queryByRole("heading", { name: "코드 비교 제출" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "면접 진행" })).not.toBeInTheDocument();

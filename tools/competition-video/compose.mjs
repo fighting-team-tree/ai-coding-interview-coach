@@ -12,6 +12,7 @@ import {
   verifyCommand,
   writeJson,
 } from "./lib.mjs";
+import { renderCompetitionAudio } from "./render-audio.mjs";
 
 async function readMetadata(bundleDir) {
   const metadataPath = path.join(bundleDir, "metadata.json");
@@ -36,6 +37,7 @@ export async function composeCompetitionVideo(options = {}) {
 
   await ensureDir(finalDir);
   await verifyCommand("ffmpeg", ["-version"]);
+  await verifyCommand("ffprobe", ["-version"]);
 
   const concatFile = path.join(bundleDir, "concat.txt");
   const finalPath = path.join(finalDir, `${metadata.outputName}-${metadata.mode}.mp4`);
@@ -44,34 +46,91 @@ export async function composeCompetitionVideo(options = {}) {
     .join("\n");
   await fs.writeFile(concatFile, `${concatContent}\n`, "utf-8");
 
-  await runCommand(
-    "ffmpeg",
-    [
-      "-y",
-      "-f",
-      "concat",
-      "-safe",
-      "0",
-      "-i",
-      concatFile,
-      "-vf",
-      "fps=30,format=yuv420p",
-      "-c:v",
-      "libx264",
-      "-preset",
-      "medium",
-      "-crf",
-      "20",
-      "-movflags",
-      "+faststart",
-      "-an",
-      finalPath,
-    ],
-    { label: "ffmpeg compose" },
+  const audioAssets = await renderCompetitionAudio({
+    bundleDir,
+    scenario,
+    metadata,
+  });
+
+  const ffmpegArgs = [
+    "-y",
+    "-f",
+    "concat",
+    "-safe",
+    "0",
+    "-i",
+    concatFile,
+  ];
+
+  if (audioAssets.narrationPath) {
+    ffmpegArgs.push("-i", audioAssets.narrationPath);
+  }
+
+  if (audioAssets.bgmPath) {
+    ffmpegArgs.push("-i", audioAssets.bgmPath);
+  }
+
+  const hasNarration = Boolean(audioAssets.narrationPath);
+  const hasBgm = Boolean(audioAssets.bgmPath);
+
+  if (hasNarration || hasBgm) {
+    const filters = [];
+    const narrationInputIndex = hasNarration ? 1 : null;
+    const bgmInputIndex = hasBgm ? (hasNarration ? 2 : 1) : null;
+
+    if (hasNarration && hasBgm) {
+      filters.push(`[${narrationInputIndex}:a]asplit=2[voice_sidechain][voice_mix]`);
+      filters.push(`[${bgmInputIndex}:a]volume=1.0[bgm]`);
+      filters.push(
+        `[bgm][voice_sidechain]sidechaincompress=threshold=${audioAssets.audio.bgm.duckingThreshold}:ratio=${audioAssets.audio.bgm.duckingRatio}:attack=${audioAssets.audio.bgm.attackMs}:release=${audioAssets.audio.bgm.releaseMs}[bgmducked]`,
+      );
+      filters.push(
+        `[bgmducked][voice_mix]amix=inputs=2:normalize=0,alimiter=limit=0.95[aout]`,
+      );
+    } else if (hasNarration) {
+      filters.push(`[${narrationInputIndex}:a]alimiter=limit=0.95[aout]`);
+    } else if (hasBgm) {
+      filters.push(`[${bgmInputIndex}:a]alimiter=limit=0.9[aout]`);
+    }
+
+    ffmpegArgs.push(
+      "-filter_complex",
+      filters.join(";"),
+      "-map",
+      "0:v:0",
+      "-map",
+      "[aout]",
+    );
+  }
+
+  ffmpegArgs.push(
+    "-vf",
+    "fps=30,format=yuv420p",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "20",
   );
+
+  if (hasNarration || hasBgm) {
+    ffmpegArgs.push("-c:a", "aac", "-b:a", "192k", "-shortest");
+  } else {
+    ffmpegArgs.push("-an");
+  }
+
+  ffmpegArgs.push("-movflags", "+faststart", finalPath);
+
+  await runCommand("ffmpeg", ffmpegArgs, { label: "ffmpeg compose" });
 
   const nextMetadata = {
     ...metadata,
+    audioDir: audioAssets.audioDir,
+    audioTracks: {
+      narration: audioAssets.narrationPath,
+      bgm: audioAssets.bgmPath,
+    },
     finalVideo: finalPath,
     composedAt: new Date().toISOString(),
   };

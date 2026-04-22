@@ -617,7 +617,10 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         </div>
 
         <div className="flex flex-col gap-6 lg:col-span-5 h-full">
-          <div className="linear-card flex flex-col h-full border-border-subtle bg-[#0f1011] overflow-hidden max-h-[850px]">
+          <div
+            className="linear-card flex flex-col h-full border-border-subtle bg-[#0f1011] overflow-hidden max-h-[850px]"
+            data-video-interview-panel
+          >
             <div className="flex justify-between items-start p-5 border-b border-border-subtle bg-[rgba(255,255,255,0.01)] shrink-0">
               <div>
                 <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase mb-1">질문 흐름</div>
@@ -636,7 +639,11 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               </p>
             </div>
 
-            <div ref={chatLogRef} className="flex-1 overflow-y-auto p-5 space-y-4 min-h-[250px]">
+            <div
+              ref={chatLogRef}
+              className="flex-1 overflow-y-auto p-5 space-y-4 min-h-[250px]"
+              data-video-chat-log
+            >
               {session.turns.length === 0 ? (
                 <p className="text-text-tertiary text-sm text-center mt-10">코드를 제출하면 첫 질문이 시작됩니다.</p>
               ) : (
@@ -775,7 +782,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       ) : null}
 
       {report ? (
-        <section className="flex flex-col gap-8 mt-12">
+        <section className="flex flex-col gap-8 mt-12" data-video-report>
           <div className="linear-card p-8 bg-[rgba(255,255,255,0.02)] flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-border-subtle">
             <div className="flex flex-col gap-3 max-w-2xl">
               <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">세션 결과</div>

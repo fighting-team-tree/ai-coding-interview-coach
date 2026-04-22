@@ -12,7 +12,7 @@ export async function openFeaturedProblem(page: Page) {
   await expect(
     page.getByRole("heading", { name: "같은 흐름으로 확인할 추가 문제" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "대표 문제 시작하기 →" }).click();
+  await page.locator("[data-video-cta='featured-problem']").first().click();
   await expect(page).toHaveURL(/\/problems\/two-pointer-window$/);
   await expect(page.getByRole("heading", { name: "연속 부분 수열의 최소 길이" })).toBeVisible();
 }

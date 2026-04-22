@@ -9,6 +9,7 @@
    - intro / demo / outro raw clip을 각각 `.webm`으로 저장합니다.
 2. `compose.mjs`
    - `ffmpeg`로 raw clip을 이어 붙이고 최종 `mp4`를 생성합니다.
+   - 로컬 TTS와 ambient BGM을 렌더링해 최종 오디오까지 합성합니다.
 
 ## 기본 명령
 
@@ -39,6 +40,10 @@ output/competition-video/<scenario>/<timestamp>/
     01-intro.webm
     02-demo.webm
     03-outro.webm
+  audio/
+    narration.wav
+    bgm.wav
+    audio-metadata.json
   final/
     ai-champion-core-demo.mp4
   metadata.json
@@ -64,25 +69,55 @@ output/competition-video/<scenario>/<timestamp>/
 - `demo.holds.afterTurnMs`
 - `demo.holds.beforeReportMs`
 - `outro`
+- `audio`
+- `audio.tts`
+- `audio.bgm`
 
 `turnCaptions`는 `answers`와 길이를 맞춰 각 턴마다 다른 자막을 노출할 때 사용합니다. 미지정 시 기존 `demo.captions.interview`를 모든 턴에 재사용합니다.
 
+`audio`는 시나리오별 음성 합성 설정입니다.
+
+- `audio.tts.engine`
+- `audio.tts.language`
+- `audio.tts.speaker`
+- `audio.tts.speed`
+- `audio.tts.device`
+- `audio.tts.pythonVersion`
+- `audio.tts.offsetMs`
+- `audio.bgm.volume`
+- `audio.bgm.assetPath`
+- `audio.bgm.fadeInMs`
+- `audio.bgm.fadeOutMs`
+- `audio.bgm.duckingThreshold`
+- `audio.bgm.duckingRatio`
+- `audio.bgm.attackMs`
+- `audio.bgm.releaseMs`
+
 녹화 스크립트는 코드 제출 직후, 각 답변 전송 직후, 리포트 진입 직후에 인터뷰 패널과 채팅 로그를 다시 보이도록 스크롤을 보정합니다. 제출용 촬영에서는 이 방어 로직을 유지하는 편이 안전합니다.
+또한 demo clip에서 실제 caption이 등장한 시각을 `metadata.json`에 저장하고, compose 단계는 그 시각을 기준으로 TTS를 배치합니다. 따라서 자막과 낭독이 따로 놀지 않습니다.
 
 새 대회를 준비할 때는 기존 시나리오를 복사해 텍스트, 문제 경로, 답변 세트, 타이밍만 바꾸면 됩니다.
 
 ## 의존성
 
 - `ffmpeg`
+- `ffprobe`
 - `uv`
 - `python`
 - Playwright Chromium
+- MeloTTS 실행용 Python 3.10 환경
 
 Chromium이 없다면 아래를 먼저 실행합니다.
 
 ```bash
 npm run qa:install
 ```
+
+로컬 TTS를 쓰므로 현재 제출용 오디오 파이프라인은 워크스페이스 안에서 격리된 MeloTTS 환경을 띄워 사용합니다.
+현재 오디오 파이프라인은 `uv run --python 3.10 --with git+https://github.com/myshell-ai/MeloTTS.git --with mecab-ko-msvc --with mecab-ko-dic-msvc` 형태로 MeloTTS를 격리 실행합니다. 한국어는 `language: KR`, `speaker: KR`을 기본으로 사용합니다.
+Windows에서는 `g2pkk`가 기대하는 `eunjeon` 인터페이스를 `tools/competition-video/python-shims/eunjeon.py`에서 `mecab-ko-msvc` 기반으로 맞춰줍니다.
+첫 실행 시에는 MeloTTS 패키지, Python 3.10 런타임, 한국어 모델, 그리고 형태소 분석 리소스를 내려받기 때문에 시간이 더 걸릴 수 있습니다.
+외부 BGM을 쓰려면 `audio.bgm.assetPath`에 프로젝트 기준 경로를 넣으면 됩니다. 현재 기본값은 [README.md](C:/Users/fkjy1/dev/Hackathon/AI_CHAMPION/tools/competition-video/assets/bgm/README.md) 에 기록된 Mixkit `Opalescent` 트랙입니다.
 
 ## 참고
 

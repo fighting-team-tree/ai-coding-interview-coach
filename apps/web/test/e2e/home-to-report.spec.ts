@@ -7,7 +7,7 @@ test("홈 대시보드에서 대표 문제 CTA를 노출한다", async ({ page }
 
   await expect(page.getByRole("link", { name: /AI Champion/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "같은 흐름으로 확인할 추가 문제" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "대표 문제 시작하기 →" })).toHaveAttribute(
+  await expect(page.locator("[data-video-cta='featured-problem']").first()).toHaveAttribute(
     "href",
     "/problems/two-pointer-window",
   );
