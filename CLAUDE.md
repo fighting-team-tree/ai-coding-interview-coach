@@ -10,6 +10,10 @@ AI Champion 2026 (8개월 장기전, 제안서 마감 2026-04-24, 결선 12월)
 - **AI:** LangGraph, Claude API, Deepgram(STT), Cartesia(TTS), LanceDB, PostgreSQL
 - **Infra:** Firebase Hosting, GitHub Actions CI | 모노레포: `apps/web`, `apps/api`
 
+## 디자인 가이드라인 (최우선)
+- **DESIGN.md:** 모든 UI/UX 작업은 `DESIGN.md`에 정의된 Linear 스타일(다크 모드, 고정밀 그리드, 투명 테두리 등)을 반드시 준수해야 함.
+- **.impeccable.md:** 브랜드 페르소나와 "Control-room tone"을 확인하여 디자인의 맥락을 파악할 것.
+
 ## 워크플로우 → `.claude/rules/workflow.md`
 탐색 → 브리핑 → **AskUserQuestion으로 승인** → 실행. 계획과 실행은 별도 턴.
 

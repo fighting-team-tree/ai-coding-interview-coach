@@ -57,6 +57,7 @@ Use it as Codex-native workflow guidance, not as Claude-only metadata.
 
 ## Project-Specific Rules
 
+- **Design Mandate:** ALL agents must prioritize `DESIGN.md` for any UI/UX modifications. The "Linear Style" (dark-mode-first, precision engineering) is the standard for this project.
 - Prioritize product and architecture coherence over speculative implementation.
 - Treat the journey from coding test submission to interview practice as the top-level user flow.
 - Proposal and planning output must align with `docs/proposal_template.md`.
