@@ -76,7 +76,7 @@ describe("ProblemWorkspace", () => {
     expect(screen.getByText("느린 코드").closest("button")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeInTheDocument();
     expect(screen.getByText("positive numbers")).toBeInTheDocument();
-    expect(screen.getByText("질문이 참고하는 범위")).toBeInTheDocument();
+    expect(screen.getByText("질문이 확인하는 기준")).toBeInTheDocument();
     expect(screen.queryByText("기관 활용 포인트")).not.toBeInTheDocument();
   });
 
@@ -138,7 +138,7 @@ describe("ProblemWorkspace", () => {
             evidence_refs: [
               { kind: "ast", label: "중첩 루프", detail: "모든 구간 합을 순회하고 있습니다." },
             ],
-            guardrail_note: "문제 Fact와 AST 근거 안에서만 질문합니다.",
+            guardrail_note: "질문은 이 범위를 벗어나지 않습니다: 정답 코드를 직접 제공하지 않습니다.",
           },
         ],
         question_mode: "deterministic",
@@ -155,7 +155,7 @@ describe("ProblemWorkspace", () => {
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
     expect(
-      await screen.findByRole("heading", { name: "코드 근거 기반 면접 시연" }),
+      await screen.findByRole("heading", { name: "코드 기반 면접 시연" }),
     ).toBeInTheDocument();
     expect(scrollToSpy).toHaveBeenCalledWith({
       top: 0,
@@ -206,7 +206,7 @@ describe("ProblemWorkspace", () => {
             evidence_refs: [
               { kind: "ast", label: "중첩 루프", detail: "모든 구간 합을 순회하고 있습니다." },
             ],
-            guardrail_note: "문제 Fact와 AST 근거 안에서만 질문합니다.",
+            guardrail_note: "질문은 이 범위를 벗어나지 않습니다: 정답 코드를 직접 제공하지 않습니다.",
           },
         ],
         question_mode: "deterministic",
@@ -223,7 +223,6 @@ describe("ProblemWorkspace", () => {
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
     expect(await screen.findByText("면접 질문")).toBeInTheDocument();
-    expect(screen.getByText("시연 안정 모드")).toBeInTheDocument();
     expect(screen.queryByText("AI 면접관")).not.toBeInTheDocument();
     const chatBubble = screen.getByText("면접 질문").parentElement;
     expect(chatBubble).not.toBeNull();

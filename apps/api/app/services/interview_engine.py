@@ -21,16 +21,22 @@ class InterviewEngine:
     def _primary_signal(self, session: InterviewSession, flow: FlowType) -> str:
         profile = session.ast_profile
         if profile is None:
-            return "AST profile unavailable"
+            return "코드 분석 정보가 없습니다."
         if flow == FlowType.fallback and not profile.parse_ok:
-            return profile.notes[0] if profile.notes else "Code parsing failed"
+            return profile.notes[0] if profile.notes else "코드를 해석할 수 없습니다."
         if flow == FlowType.fallback and profile.cyclomatic_complexity >= 15:
-            return f"Cyclomatic complexity {profile.cyclomatic_complexity} triggered fallback"
+            return (
+                "분기 수가 많아 접근 설명부터 다시 확인합니다. "
+                f"({profile.cyclomatic_complexity})"
+            )
         if flow == FlowType.normal:
             if profile.has_risky_ops:
-                return f"Risky operation detected: {profile.has_risky_ops[0]}"
-            return f"Nested loop depth {profile.nested_loop_depth} requires complexity defense"
-        return "Low-risk AST profile unlocked scale-up interview mode"
+                return f"비용이 큰 연산이 감지되었습니다. ({profile.has_risky_ops[0]})"
+            return (
+                "중첩 반복문이 감지되어 복잡도 설명이 필요합니다. "
+                f"(깊이 {profile.nested_loop_depth})"
+            )
+        return "위험 신호가 적어 더 넓은 질문으로 이어집니다."
 
     def build_branch_decision(self, session: InterviewSession) -> BranchDecision:
         profile = session.ast_profile
@@ -74,37 +80,37 @@ class InterviewEngine:
 
     def _pick_goal(self, problem: Problem, turn_index: int) -> str:
         if not problem.follow_up_goals:
-            return "지원자의 reasoning과 trade-off 설명을 확인한다."
+            return "지원자의 판단 근거와 트레이드오프 설명을 확인합니다."
         return problem.follow_up_goals[min(turn_index, len(problem.follow_up_goals) - 1)]
 
     def _ast_reference(self, session: InterviewSession) -> EvidenceRef:
         profile = session.ast_profile
         if profile is None:
-            return EvidenceRef(kind="ast", label="AST profile", detail="No AST profile captured")
+            return EvidenceRef(kind="ast", label="코드 분석", detail="분석 결과가 아직 없습니다.")
         if not profile.parse_ok:
             return EvidenceRef(
                 kind="ast",
-                label="AST parse status",
-                detail=profile.notes[0] if profile.notes else "Parse failed",
+                label="파싱 상태",
+                detail=profile.notes[0] if profile.notes else "코드를 해석하지 못했습니다.",
             )
         if profile.has_risky_ops:
             return EvidenceRef(
                 kind="ast",
-                label="Detected risky op",
+                label="비용이 큰 연산",
                 detail=profile.has_risky_ops[0],
             )
         if profile.nested_loop_depth >= 2:
             return EvidenceRef(
                 kind="ast",
-                label="Nested loop depth",
-                detail=f"Detected nested loop depth {profile.nested_loop_depth}",
+                label="중첩 루프 깊이",
+                detail=f"중첩 루프 깊이 {profile.nested_loop_depth}가 감지되었습니다.",
             )
         return EvidenceRef(
             kind="ast",
-            label="Low-risk AST profile",
+            label="안정적인 코드 신호",
             detail=(
-                f"nested_loop_depth={profile.nested_loop_depth}, "
-                f"cyclomatic_complexity={profile.cyclomatic_complexity}"
+                f"중첩 루프 깊이 {profile.nested_loop_depth}, "
+                f"순환 복잡도 {profile.cyclomatic_complexity}"
             ),
         )
 
@@ -123,11 +129,11 @@ class InterviewEngine:
         ast_ref = self._ast_reference(session)
 
         evidence_refs = [
-            EvidenceRef(kind="branch", label="Selected flow", detail=branch.primary_signal),
-            EvidenceRef(kind="fact", label="Problem fact", detail=fact),
-            EvidenceRef(kind="goal", label="Follow-up goal", detail=goal),
+            EvidenceRef(kind="branch", label="선택된 흐름", detail=branch.primary_signal),
+            EvidenceRef(kind="fact", label="문제 조건", detail=fact),
+            EvidenceRef(kind="goal", label="다음 질문 방향", detail=goal),
             ast_ref,
-            EvidenceRef(kind="boundary", label="Forbidden boundary", detail=guardrail),
+            EvidenceRef(kind="boundary", label="질문 제한", detail=guardrail),
         ]
 
         if branch.flow_type == FlowType.fallback:
@@ -141,7 +147,7 @@ class InterviewEngine:
                 "이 풀이에서 끝까지 유지해야 하는 핵심 상태나 불변식은 무엇인가요?",
                 "같은 문제를 다시 푼다면 어떤 구조로 더 단순하게 다시 짜겠어요?",
             ]
-            intent = "핵심 개념 복구 질문"
+            intent = "핵심 개념 복구"
         elif branch.flow_type == FlowType.plan_b:
             prompts = [
                 (
@@ -155,7 +161,7 @@ class InterviewEngine:
                     "코드 리뷰에서 이 풀이를 방어해야 한다면 가장 먼저 어떤 근거를 말하겠어요?"
                 ),
             ]
-            intent = "Scale-up 압박 질문"
+            intent = "확장 상황 확인"
         else:
             trap_focus = (
                 problem.traps[min(turn_index, len(problem.traps) - 1)]
@@ -173,7 +179,7 @@ class InterviewEngine:
             )
             evidence_refs.insert(
                 2,
-                EvidenceRef(kind="trap", label="Active trap", detail=trap_signal),
+                EvidenceRef(kind="trap", label="이번 질문의 확인 포인트", detail=trap_signal),
             )
             prompts = [
                 trap_hint,
@@ -181,7 +187,7 @@ class InterviewEngine:
                 "이 접근이 흔들리는 입력이나 반례를 하나 들어보세요.",
                 "이 코드를 다시 제출한다면 어떤 한 줄 또는 한 구조를 가장 먼저 바꾸겠나요?",
             ]
-            intent = "취약점 기반 꼬리질문"
+            intent = "풀이 약점 확인"
 
         prompt = prompts[min(turn_index, len(prompts) - 1)]
 
@@ -189,7 +195,7 @@ class InterviewEngine:
             prompt=prompt,
             intent=intent,
             evidence_refs=evidence_refs,
-            guardrail_note=f"질문 가드레일: {guardrail}",
+            guardrail_note=f"질문은 이 범위를 벗어나지 않습니다: {guardrail}",
         )
 
     async def start_interview(self, *, problem: Problem, session: InterviewSession) -> str:

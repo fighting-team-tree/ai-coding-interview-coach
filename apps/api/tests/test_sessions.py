@@ -153,7 +153,7 @@ def test_judge0_demo_mode_does_not_mark_submission_as_passed() -> None:
 
     assert result.mode == "demo"
     assert result.passed is False
-    assert result.status == "Demo mode: Judge0 not configured"
+    assert result.status == "내장 실행 모드"
 
 
 @pytest.mark.parametrize(

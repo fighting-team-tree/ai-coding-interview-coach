@@ -28,18 +28,18 @@ const MAX_INTERVIEW_TURNS = 4;
 const FLOW_META = {
   normal: {
     label: "일반 심화 질문",
-    focus: "취약점 기반 꼬리질문",
-    description: "탐지된 trap과 AST 신호를 근거로 코드의 약한 지점을 압박합니다.",
+    focus: "풀이 약점 확인",
+    description: "현재 풀이의 취약한 지점을 중심으로 질문합니다.",
   },
   plan_b: {
     label: "확장 검증 질문",
-    focus: "확장 조건 검증",
-    description: "코드 리스크가 낮을 때 더 큰 입력, 트레이드오프, 리뷰 방어 질문으로 확장합니다.",
+    focus: "확장 상황 확인",
+    description: "풀이가 안정적이면 입력 변화와 대안 판단까지 묻습니다.",
   },
   fallback: {
     label: "개념 복구 질문",
-    focus: "핵심 개념 복구 질문",
-    description: "파싱 실패나 복잡도 과다 상황에서 구현보다 접근과 불변식부터 복구합니다.",
+    focus: "핵심 개념 복기",
+    description: "코드보다 접근과 핵심 개념부터 다시 확인합니다.",
   },
 } as const;
 
@@ -55,9 +55,9 @@ const STATUS_META: Record<
 };
 
 const MODE_LABEL = {
-  pending: "대기",
-  llm: "LLM 연동",
-  deterministic: "규칙 기반",
+  pending: "준비 중",
+  llm: "모델 기반",
+  deterministic: "안정 모드",
 } as const;
 
 const EXECUTION_MODE_LABEL = {
@@ -66,12 +66,12 @@ const EXECUTION_MODE_LABEL = {
 } as const;
 
 const EVIDENCE_LABEL = {
-  fact: "사실",
-  trap: "함정",
-  ast: "코드 신호",
-  goal: "질문 목표",
-  boundary: "질문 경계",
-  branch: "분기 근거",
+  fact: "문제 조건",
+  trap: "주의 포인트",
+  ast: "코드 분석",
+  goal: "질문 의도",
+  boundary: "질문 제한",
+  branch: "선택 근거",
 } as const;
 
 const DIFFICULTY_LABEL = {
@@ -102,17 +102,17 @@ const CONTROL_COMPARISON: Record<
       {
         question: "지금 구현의 최악 시간복잡도를 수식으로 설명해 주세요.",
         kind: "ast",
-        source: "중첩 루프 깊이 신호",
+        source: "중첩 반복문 신호",
       },
       {
         question: "입력 전제에서 이 접근이 성립하는 핵심 이유를 말씀해 주세요.",
         kind: "fact",
-        source: "문제 Fact 범위",
+        source: "문제 조건",
       },
       {
         question: "더 나은 접근이 가능한지, 있다면 왜인지 한 문장으로 설명해 주세요.",
         kind: "goal",
-        source: "Follow-up Goal",
+        source: "다음 질문 방향",
       },
     ],
   },
@@ -126,17 +126,17 @@ const CONTROL_COMPARISON: Record<
       {
         question: "입력 규모가 10배 커지면 현재 구현은 어디에서 먼저 한계를 만날까요?",
         kind: "goal",
-        source: "스케일업 압박",
+        source: "입력 규모 변화",
       },
       {
         question: "메모리 제약이 달라지면 이 자료 구조를 어떻게 방어하시겠어요?",
         kind: "boundary",
-        source: "Forbidden Boundary",
+        source: "질문 범위",
       },
       {
         question: "시니어 리뷰어가 이 코드를 거절한다면 가장 유력한 이유는 무엇일까요?",
         kind: "goal",
-        source: "리뷰 방어 훈련",
+        source: "리뷰 관점",
       },
     ],
   },
@@ -150,17 +150,17 @@ const CONTROL_COMPARISON: Record<
       {
         question: "코드는 잠시 접어두고, 이 문제 접근의 핵심 불변식을 한 문장으로 말씀해 주세요.",
         kind: "goal",
-        source: "핵심 개념 복구",
+        source: "핵심 개념",
       },
       {
         question: "지금 시도한 방법이 풀이로서 가능한 전제 조건을 설명해 주세요.",
         kind: "fact",
-        source: "문제 Fact",
+        source: "문제 조건",
       },
       {
         question: "최소 입력 케이스를 소리 내어 추적해 보세요.",
         kind: "goal",
-        source: "접근 복구 연습",
+        source: "접근 복기",
       },
     ],
   },
@@ -395,17 +395,17 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
         : "코드 제출 대기",
       detail:
         session.branch_decision?.primary_signal ??
-        "코드를 제출하면 코드 신호를 분석해 질문 방식이 자동으로 결정됩니다.",
+        "코드를 제출하면 분석 결과에 맞는 질문 흐름이 정해집니다.",
     },
     {
-      title: "질문 엔진",
+      title: "질문 방식",
       value: MODE_LABEL[session.question_mode],
-      detail: "코드에서 발견된 신호를 근거로 질문을 생성합니다.",
+      detail: "질문은 제출 코드와 답변 내용을 바탕으로 이어집니다.",
     },
     {
-      title: "리포트 엔진",
+      title: "피드백 방식",
       value: MODE_LABEL[session.report_mode],
-      detail: "세션이 끝나면 정의·해결·설명 3축 피드백으로 정리됩니다.",
+      detail: "세션이 끝나면 세 축 피드백으로 정리됩니다.",
     },
   ] as const;
 
@@ -457,10 +457,10 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           </div>
 
           <div className="linear-card p-5 bg-[rgba(255,255,255,0.02)] border-border-subtle flex flex-col gap-4">
-            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">질문이 참고하는 범위</div>
+            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">질문이 확인하는 기준</div>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <strong className="text-sm font-[510] text-[#f7f8f8]">Fact</strong>
+                <strong className="text-sm font-[510] text-[#f7f8f8]">문제 조건</strong>
                 <ul className="flex flex-col gap-1.5 mt-2 text-[13px] text-text-secondary">
                   {previewFacts.map((fact) => (
                     <li key={fact} className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">{fact}</li>
@@ -468,7 +468,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 </ul>
               </div>
               <div>
-                <strong className="text-sm font-[510] text-[#f7f8f8]">Boundary</strong>
+                <strong className="text-sm font-[510] text-[#f7f8f8]">질문 제한</strong>
                 <ul className="flex flex-col gap-1.5 mt-2 text-[13px] text-text-secondary">
                   {previewBoundaries.map((boundary) => (
                     <li key={boundary} className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">{boundary}</li>
@@ -483,16 +483,16 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       {session.ast_profile && session.branch_decision && activeFlow ? (
         <section className="linear-card p-6 flex flex-col gap-6 border-border-subtle mt-4">
           <div className="flex flex-col gap-2 max-w-3xl">
-            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">코드 신호 → 분기 결정 → 질문 초점</div>
+            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">코드 분석 → 흐름 선택 → 질문 초점</div>
             <h2 className="text-xl font-[510] tracking-[-0.015em] text-[#f7f8f8]">왜 이 질문 흐름이 선택되었는지</h2>
             <p className="text-sm text-text-tertiary leading-relaxed">
-              AST가 뽑은 코드 신호가 어떻게 분기를 결정하고, 어떤 질문 초점으로
+              코드에서 읽은 신호가 어떻게 흐름을 결정하고, 어떤 질문 초점으로
               이어지는지 한 줄에서 확인할 수 있습니다.
             </p>
           </div>
           <div className="flex flex-col md:flex-row items-stretch gap-4 md:items-center p-4 bg-panel-dark rounded-lg border border-border-subtle shadow-inset">
             <div className="flex-1 flex flex-col gap-2 bg-[rgba(255,255,255,0.02)] p-4 rounded-lg border border-[rgba(255,255,255,0.05)]">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">1. 코드 신호 (AST)</div>
+              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">1. 코드 분석 결과</div>
               <ul className="flex flex-col gap-1 text-[13px] text-text-secondary mt-1">
                 <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
                 <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">
@@ -512,7 +512,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               →
             </div>
             <div className="flex-1 flex flex-col gap-2 bg-[rgba(255,255,255,0.02)] p-4 rounded-lg border border-[rgba(255,255,255,0.05)]">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">2. 분기 결정</div>
+              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">2. 흐름 선택</div>
               <strong className="text-sm font-[510] text-[#f7f8f8]">{activeFlow.label}</strong>
               <small className="text-[13px] text-text-tertiary">{session.branch_decision.primary_signal}</small>
               {session.branch_decision.reason_codes.length ? (
@@ -621,7 +621,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className="flex justify-between items-start p-5 border-b border-border-subtle bg-[rgba(255,255,255,0.01)] shrink-0">
               <div>
                 <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase mb-1">질문 흐름</div>
-                <h2 className="text-lg font-[510] tracking-[-0.01em] text-[#f7f8f8]">코드 근거 기반 면접 시연</h2>
+                <h2 className="text-lg font-[510] tracking-[-0.01em] text-[#f7f8f8]">코드 기반 면접 시연</h2>
               </div>
               <span className={`pill ${statusMeta.tone === 'success' ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20' : statusMeta.tone === 'warning' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : statusMeta.tone === 'active' ? 'bg-[#5e6ad2]/10 text-[#7170ff] border-[#5e6ad2]/20' : 'bg-[rgba(255,255,255,0.05)] text-text-secondary border-border-subtle'}`}>{statusMeta.label}</span>
             </div>
@@ -629,9 +629,6 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             <div className={`mx-5 mt-5 mb-1 p-4 rounded-lg border text-sm shrink-0 ${session.flow_type ? 'bg-[#5e6ad2]/10 border-[#5e6ad2]/20 text-[#d0d6e0]' : 'bg-[rgba(255,255,255,0.02)] border-border-subtle text-text-tertiary'}`}>
               <div className="flex justify-between items-center mb-2">
                 <strong className="font-[510] text-[#f7f8f8]">{activeFlow?.label ?? "코드 제출 대기"}</strong>
-                {session.question_mode === "deterministic" ? (
-                  <span className="badge-subtle bg-[rgba(255,255,255,0.1)] border-border-subtle text-text-primary">시연 안정 모드</span>
-                ) : null}
               </div>
               <p className="leading-relaxed">
                 {session.branch_decision?.primary_signal ??
@@ -721,7 +718,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
                 <div className="flex flex-col gap-2">
                   <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">코드 분석 요약</div>
                   <ul className="flex flex-col gap-1 text-[13px] text-text-secondary mt-1">
-                    <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">파싱 성공: {String(session.ast_profile.parse_ok)}</li>
+                    <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">파싱 상태: {session.ast_profile.parse_ok ? "성공" : "실패"}</li>
                     <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">중첩 루프 깊이: {session.ast_profile.nested_loop_depth}</li>
                     <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">순환 복잡도: {session.ast_profile.cyclomatic_complexity}</li>
                     <li className="flex items-start gap-2 before:content-['·'] before:text-text-quaternary">위험 연산: {session.ast_profile.has_risky_ops.join(", ") || "없음"}</li>
@@ -736,19 +733,17 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
       {session.branch_decision ? (
         <section className="linear-card p-8 mt-8 border-border-subtle bg-[#0f1011]">
           <div className="flex flex-col gap-3 max-w-3xl mb-8">
-            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">범용 LLM vs 통제형 질문 생성</div>
-            <h2 className="text-xl font-[510] tracking-[-0.01em] text-[#f7f8f8]">같은 코드 입력에 대해 질문이 어떻게 달라지는가</h2>
+            <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">질문 흐름 비교</div>
+            <h2 className="text-xl font-[510] tracking-[-0.01em] text-[#f7f8f8]">같은 코드라도 질문 톤은 달라집니다</h2>
             <p className="text-sm text-text-tertiary leading-relaxed">
-              자유 프롬프트 기반 범용 LLM은 주제 이탈 위험이 크고 근거 추적이 어렵습니다.
-              본 시스템은 문제별 Fact/Trap/Forbidden Boundary 범위 안에서만 질문을
-              생성하므로, 모든 질문에 대해 코드·문제 근거를 역추적할 수 있습니다.
+              막연한 질문과 코드 기반 질문을 나란히 두고, 어떤 차이가 있는지 바로 비교할 수 있습니다.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <article className="flex flex-col gap-4 p-5 rounded-xl border border-border-subtle bg-[rgba(255,255,255,0.02)]">
               <header className="flex flex-col gap-2 pb-4 border-b border-[rgba(255,255,255,0.05)]">
-                <span className="badge-subtle bg-yellow-500/10 text-yellow-400 border-yellow-500/20 self-start text-[11px]">범용 대화형 LLM</span>
-                <small className="text-[13px] text-text-tertiary">주제 이탈 · 근거 없음 · 검수 불가</small>
+                <span className="badge-subtle bg-yellow-500/10 text-yellow-400 border-yellow-500/20 self-start text-[11px]">막연한 질문</span>
+                <small className="text-[13px] text-text-tertiary">코드와 직접 연결되지 않음</small>
               </header>
               <ul className="flex flex-col gap-3 text-[14px] text-text-secondary list-disc pl-4 marker:text-[rgba(255,255,255,0.2)]">
                 {CONTROL_COMPARISON[session.branch_decision.flow_type].generic.map((question) => (
@@ -758,8 +753,8 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
             </article>
             <article className="flex flex-col gap-4 p-5 rounded-xl border border-[#10b981]/20 bg-[#10b981]/5 shadow-[0_0_15px_rgba(16,185,129,0.03)_inset]">
               <header className="flex flex-col gap-2 pb-4 border-b border-[rgba(255,255,255,0.05)]">
-                <span className="badge-subtle bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 self-start text-[11px]">통제형 기술면접</span>
-                <small className="text-[13px] text-[#10b981]/70">Fact/Trap 범위 내 · 근거 명시 · 재현 가능</small>
+                <span className="badge-subtle bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 self-start text-[11px]">코드 기반 질문</span>
+                <small className="text-[13px] text-[#10b981]/70">코드와 문제 조건을 함께 확인</small>
               </header>
               <ul className="flex flex-col gap-5 text-[14px] text-[#f7f8f8]">
                 {CONTROL_COMPARISON[session.branch_decision.flow_type].controlled.map((example) => (
@@ -781,21 +776,9 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
       {report ? (
         <section className="flex flex-col gap-8 mt-12">
-          {session.report_mode === "deterministic" ? (
-            <div className="linear-card p-5 bg-[#5e6ad2]/10 border-[#5e6ad2]/20 flex flex-col gap-2 text-sm text-[#d0d6e0]">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#7170ff] uppercase">외부 의존성 대응 모드</div>
-              <p className="leading-relaxed">
-                외부 LLM이 없어도 대화 로그 휴리스틱 기반으로 3축 리포트가 자동 생성됩니다.
-                제안서 2.7에서 정의한 <strong className="font-[510] text-[#f7f8f8]">&apos;외부 의존성 하의 데모 안정성&apos;</strong>{" "}
-                요건 — 외부 API 불안정 상황에서도 세션을 완주하는 fallback 구조가 실제로
-                작동 중입니다.
-              </p>
-            </div>
-          ) : null}
-
           <div className="linear-card p-8 bg-[rgba(255,255,255,0.02)] flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-border-subtle">
             <div className="flex flex-col gap-3 max-w-2xl">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">Stage 03</div>
+              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">세션 결과</div>
               <h2 className="text-2xl font-[510] tracking-[-0.015em] text-[#f7f8f8]">3축 피드백</h2>
               <p className="text-[15px] text-text-secondary leading-relaxed">{report.summary}</p>
             </div>
@@ -827,36 +810,35 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
             <button className="btn-primary px-6 py-2.5" onClick={retryBootstrap}>
-              같은 문제 다시 시연하기
+              같은 문제 다시 진행하기
             </button>
             <Link className="btn-ghost px-6 py-2.5" href="/">
-              다른 시연 문제 보기
+              다른 문제 보기
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
             <div className="linear-card p-6 border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] flex flex-col gap-3">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">시연 요약</div>
-              <h3 className="text-lg font-[510] text-[#f7f8f8] tracking-[-0.01em]">이번 시연에서 어떤 흐름이 선택됐는지</h3>
+              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">세션 요약</div>
+              <h3 className="text-lg font-[510] text-[#f7f8f8] tracking-[-0.01em]">이번 세션 흐름</h3>
               <p className="text-sm text-[#d0d6e0] leading-relaxed mt-1">
-                분기:{" "}
+                질문 흐름:{" "}
                 {session.branch_decision
                   ? FLOW_META[session.branch_decision.flow_type].label
                   : "대기"}{" "}
-                / 질문 엔진: {MODE_LABEL[session.question_mode]} / 리포트 엔진:{" "}
+                / 질문 방식: {MODE_LABEL[session.question_mode]} / 피드백 방식:{" "}
                 {MODE_LABEL[session.report_mode]}
               </p>
               <p className="text-[13px] text-text-tertiary leading-relaxed mt-2">
-                어떤 코드 신호 때문에 이 질문 흐름이 선택됐는지, 그리고 피드백이 어떤 방식으로
-                정리됐는지 빠르게 복기할 수 있습니다.
+                어떤 코드 신호 때문에 이 질문 흐름이 선택됐는지 빠르게 복기할 수 있습니다.
               </p>
             </div>
 
             <div className="linear-card p-6 border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] flex flex-col gap-3">
-              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">다음 검증 포인트</div>
-              <h3 className="text-lg font-[510] text-[#f7f8f8] tracking-[-0.01em]">다음 시연에서 먼저 확인할 약점 축</h3>
+              <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase">다음 연습 포인트</div>
+              <h3 className="text-lg font-[510] text-[#f7f8f8] tracking-[-0.01em]">다음에 먼저 보완할 축</h3>
               <p className="text-sm text-[#d0d6e0] leading-relaxed mt-1">
-                약한 축: {weakestAxis?.label ?? "미확정"} / 대표 신호:{" "}
+                약한 축: {weakestAxis?.label ?? "미확정"} / 핵심 근거:{" "}
                 {session.branch_decision?.primary_signal ?? "대기"}
               </p>
               <ul className="list-disc pl-5 text-[13px] text-text-tertiary space-y-1.5 marker:text-text-quaternary mt-3">

@@ -21,11 +21,11 @@ class Judge0Client:
     async def execute_python(self, code: str) -> JudgeResult:
         if not self.base_url:
             return JudgeResult(
-                status="Demo mode: Judge0 not configured",
+                status="내장 실행 모드",
                 passed=False,
                 stdout=(
-                    "Execution was skipped because Judge0 is not configured "
-                    "for this environment."
+                    "이 환경에서는 실행 서버가 연결되어 있지 않아 "
+                    "제출 코드를 실제로 실행하지 않았습니다."
                 ),
                 mode="demo",
             )
@@ -74,18 +74,15 @@ class Judge0Client:
         except (httpx.HTTPError, KeyError, ValueError) as exc:
             logger.warning("Judge0 execution failed: %s", exc)
             return JudgeResult(
-                status="Judge0 unavailable",
+                status="실행 서버 연결 실패",
                 passed=False,
-                stderr=(
-                    "Code execution could not be verified because Judge0 returned "
-                    "an invalid response or was unreachable."
-                ),
+                stderr="실행 서버 응답을 확인하지 못해 결과를 검증할 수 없습니다.",
                 mode="judge0",
             )
 
         return JudgeResult(
-            status="Timed out while polling Judge0",
+            status="실행 결과 대기 시간 초과",
             passed=False,
-            stderr="Judge0 did not return a terminal state within the polling window.",
+            stderr="실행 서버가 정해진 시간 안에 완료 상태를 돌려주지 않았습니다.",
             mode="judge0",
         )

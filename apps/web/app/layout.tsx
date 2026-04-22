@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Socratic Deep-Dive | AI Champion",
+  title: "AI Champion | 기술면접 시연",
   description:
-    "같은 문제에 다른 코드를 넣었을 때 질문과 피드백이 어떻게 달라지는지 증명하는 통제형 기술면접 평가 시스템 (Socratic Deep-Dive)",
+    "제출한 코드에 따라 질문 흐름과 피드백이 달라지는 기술면접 시연",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,17 +29,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
               <div className="flex flex-col">
                 <span className="text-brand-indigo text-[10px] font-[510] tracking-widest">
-                  통제형 기술면접 평가 시스템
+                  기술면접 시연
                 </span>
-                <strong className="text-text-primary font-[510] tracking-tight">Socratic Deep-Dive</strong>
+                <strong className="text-text-primary font-[510] tracking-tight">AI Champion</strong>
               </div>
             </Link>
             <nav className="flex items-center gap-6">
               <Link href="/#practice-problems" className="text-text-secondary hover:text-text-primary text-[13px] font-[510] transition-colors">
-                시연 문제
+                문제 둘러보기
               </Link>
-              <Link href="#" className="btn-ghost text-[13px] py-1.5 px-3">
-                저장소 보기
+              <Link href="/problems/two-pointer-window" className="btn-ghost text-[13px] py-1.5 px-3">
+                대표 문제 시작
               </Link>
             </nav>
           </div>

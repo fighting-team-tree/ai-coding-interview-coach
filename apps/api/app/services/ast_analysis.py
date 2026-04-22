@@ -5,8 +5,8 @@ import ast
 from app.models import AstProfile
 
 RISKY_CALLS = {
-    "pop": "list.pop(0) can introduce O(N) shifting costs",
-    "sorted": "sorted() may hide an extra O(N log N) operation",
+    "pop": "list.pop(0) 사용으로 O(N) 이동 비용이 생길 수 있습니다.",
+    "sorted": "sorted() 호출로 추가 O(N log N) 비용이 생길 수 있습니다.",
 }
 
 
@@ -90,7 +90,7 @@ def analyze_code(code: str) -> AstProfile:
     except SyntaxError as exc:
         return AstProfile(
             parse_ok=False,
-            notes=[f"Syntax error near line {exc.lineno}: {exc.msg}"],
+            notes=[f"{exc.lineno}번째 줄 부근 문법 오류: {exc.msg}"],
         )
 
     analyzer = _Analyzer()
@@ -98,11 +98,11 @@ def analyze_code(code: str) -> AstProfile:
 
     notes: list[str] = []
     if analyzer.max_loop_depth >= 2:
-        notes.append("Nested loops detected; complexity discussion should be triggered.")
+        notes.append("중첩 반복문이 감지되어 복잡도 설명이 필요합니다.")
     if analyzer.recursion_detected:
-        notes.append("Recursion detected; base-case reasoning should be checked.")
+        notes.append("재귀 호출이 감지되어 종료 조건 설명이 필요합니다.")
     if analyzer.risky_ops:
-        notes.append("Potentially expensive operations found in the submitted code.")
+        notes.append("비용이 큰 연산 후보가 감지되었습니다.")
 
     return AstProfile(
         parse_ok=True,

@@ -11,17 +11,17 @@ const homeMetrics = [
   {
     label: "세션 비용",
     value: "≤ $0.10",
-    note: "30명 cohort 모의면접을 $3 선에서 운영",
+    note: "30명 기준 모의면접을 약 $3로 반복 운영",
   },
   {
     label: "강사 시간 절감",
     value: "15h → 0h",
-    note: "강사 1인 30명 기준 15시간 기술면접을 자동화",
+    note: "강사 1명이 맡던 초반 질의응답을 자동 진행",
   },
   {
     label: "질문 통제",
     value: "이탈 ≤ 5%",
-    note: "Fact/Trap/Forbidden 범위 안에서만 질문 생성",
+    note: "문제 범위를 벗어나지 않도록 질문 유지",
   },
 ] as const;
 
@@ -30,23 +30,23 @@ const operatingCostBars = [
   { label: "본 시스템 (30세션)", unit: "$3", percent: 3 },
 ] as const;
 
-const controlHighlights = ["Fact", "Trap", "Follow-up Goal", "Forbidden Boundary"] as const;
+const controlHighlights = ["문제 기준", "코드 신호", "질문 방향", "제한 범위"] as const;
 
 const proofSteps = [
   {
     eyebrow: "Step 01",
     title: "문제를 고른 뒤 코드를 제출합니다.",
-    detail: "같은 문제라도 AST 신호와 trap에 따라 질문 출발점이 달라집니다.",
+    detail: "같은 문제라도 제출한 코드에 따라 첫 질문이 달라집니다.",
   },
   {
     eyebrow: "Step 02",
     title: "질문은 통제 범위 안에서만 이어집니다.",
-    detail: "주제 이탈 없이 복잡도, 불변식, 개선 방향을 차례로 확인합니다.",
+    detail: "복잡도, 판단 근거, 개선 방향을 순서대로 확인합니다.",
   },
   {
     eyebrow: "Step 03",
     title: "세션이 끝나면 3축 피드백으로 정리됩니다.",
-    detail: "정의, 해결, 설명 축에서 다음 연습 포인트까지 남깁니다.",
+    detail: "세 축 점수와 다음 연습 포인트를 한 번에 정리합니다.",
   },
 ] as const;
 
@@ -59,21 +59,21 @@ export default function HomePage() {
       <section className="flex flex-col items-center text-center max-w-3xl mx-auto gap-8">
         <div className="flex flex-col items-center gap-4">
           <span className="text-brand-indigo text-[13px] font-[510] uppercase tracking-[0.18em]">
-            대표 증명 시나리오
+            대표 시연
           </span>
           <h1 className="text-[72px] leading-tight font-[510] tracking-[-1.584px] text-text-primary text-balance">
             <span className="block">코드 신호에 따라</span>
             <span className="block text-text-secondary">질문 흐름이 달라집니다.</span>
           </h1>
           <p className="text-[18px] leading-[1.6] text-text-secondary tracking-[-0.165px] max-w-2xl text-balance mt-4">
-            이 제품이 보여줘야 하는 것은 AI와 대화하는 장면 자체가 아닙니다. 코드에서 잡힌 신호가 
-            질문 흐름을 어떻게 통제하고, 마지막에 어떤 피드백으로 정리되는지를 보여주는 것이 핵심입니다.
+            보여줘야 하는 것은 대화 장면이 아니라, 제출한 코드에 따라 질문이 어떻게 달라지고
+            마지막에 어떤 피드백이 남는지입니다.
           </p>
         </div>
 
         <div className="flex items-center gap-4 mt-6">
           <Link className="btn-ghost text-[15px] px-8 py-3 bg-white/[0.03] hover:bg-white/[0.08]" href="#practice-problems">
-            다른 문제들 먼저 둘러보기 ↓
+            문제 둘러보기 ↓
           </Link>
         </div>
       </section>
@@ -130,9 +130,9 @@ export default function HomePage() {
                         <div className="absolute w-full h-full bg-status-emerald rounded-full animate-ping opacity-75"></div>
                         <div className="relative w-1.5 h-1.5 bg-status-emerald rounded-full"></div>
                       </div>
-                      <span className="text-[12px] text-text-primary uppercase tracking-[0.1em] font-[590]">Live Demo Structure</span>
+                      <span className="text-[12px] text-text-primary uppercase tracking-[0.1em] font-[590]">대표 시연 흐름</span>
                     </div>
-                    <h3 className="text-[20px] font-[590] tracking-[-0.24px] text-white">어떻게 이탈을 통제하는가</h3>
+                    <h3 className="text-[20px] font-[590] tracking-[-0.24px] text-white">질문이 달라지는 기준</h3>
                   </div>
                 </div>
 
@@ -161,7 +161,7 @@ export default function HomePage() {
                         <p className="text-[14px] text-text-secondary leading-snug">{preview.purpose}</p>
                         <div className="mt-2 bg-[#050505] rounded-md border border-white/[0.05] p-3 font-mono">
                           <div className="text-[10px] text-text-tertiary mb-1 flex items-center gap-2">
-                            <span className="text-accent-violet">❯</span> Detected Signal
+                            <span className="text-accent-violet">❯</span> 포착된 신호
                           </div>
                           <code className="text-[12px] text-[#a5b4fc] block">
                             {preview.signal}
@@ -177,7 +177,7 @@ export default function HomePage() {
                     href={`/problems/${featuredProblem.id}`}
                     className="w-full btn-primary bg-brand-indigo text-white hover:bg-accent-hover font-[590] py-3 text-[15px] shadow-[0_0_24px_rgba(94,106,210,0.4)] hover:shadow-[0_0_32px_rgba(94,106,210,0.6)] transition-all duration-300"
                   >
-                    대표 문제로 시연 시작하기 →
+                    대표 문제 시작하기 →
                   </Link>
                 </div>
               </div>
@@ -194,8 +194,8 @@ export default function HomePage() {
         <article className="linear-card p-8 flex flex-col gap-8 shadow-sm hover:bg-white/[0.05] relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           <div className="flex flex-col gap-3 relative z-10">
-            <span className="text-[12px] text-brand-indigo font-[510] tracking-[0.1em] uppercase">대표 시연에서 바로 보이는 것</span>
-            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">첫 화면에서 이해해야 하는 메시지</h2>
+            <span className="text-[12px] text-brand-indigo font-[510] tracking-[0.1em] uppercase">이 화면에서 확인할 것</span>
+            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">첫 화면에서 바로 읽히는 흐름</h2>
           </div>
           <div className="flex flex-col gap-4">
             {proofSteps.map((step, idx) => (
@@ -219,11 +219,11 @@ export default function HomePage() {
         <article className="linear-card p-8 flex flex-col gap-8 shadow-sm hover:bg-white/[0.05] relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           <div className="flex flex-col gap-3 relative z-10">
-            <span className="text-[12px] text-accent-violet font-[510] tracking-[0.1em] uppercase">기관 운영 비교</span>
-            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">강사 1인 30명 = 15시간 vs API $3</h2>
+            <span className="text-[12px] text-accent-violet font-[510] tracking-[0.1em] uppercase">운영 기준</span>
+            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">같은 흐름을 더 적은 운영 부담으로 반복합니다</h2>
             <p className="text-[15px] text-text-secondary leading-[1.6]">
-              사업성 수치는 보조 증거로만 배치합니다. 먼저 데모 흐름을 이해한 뒤, 같은 세션을
-              훨씬 낮은 운영 비용으로 반복할 수 있다는 점을 뒷받침합니다.
+              핵심 흐름을 보여준 뒤에는, 같은 세션을 더 적은 비용과 시간으로 운영할 수 있다는 점도
+              함께 확인합니다.
             </p>
           </div>
 
@@ -252,12 +252,12 @@ export default function HomePage() {
       <section id="practice-problems" className="flex flex-col gap-8 pt-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-border-subtle pb-6">
           <div className="flex flex-col gap-2">
-            <span className="text-[12px] text-text-tertiary font-[510] tracking-[0.1em] uppercase">추가 검증 시나리오</span>
-            <h2 className="text-[32px] font-[400] tracking-[-0.704px] text-text-primary">같은 구조로 재현 가능한 추가 시연 문제</h2>
+            <span className="text-[12px] text-text-tertiary font-[510] tracking-[0.1em] uppercase">다른 연습 문제</span>
+            <h2 className="text-[32px] font-[400] tracking-[-0.704px] text-text-primary">같은 흐름으로 확인할 추가 문제</h2>
           </div>
           <div className="pill bg-white/[0.02] border-border-subtle flex items-center gap-2 py-1.5 px-3">
             <div className="w-1.5 h-1.5 rounded-full bg-status-emerald animate-pulse"></div>
-            <span className="text-text-secondary font-[400] text-[13px]">{problemCatalog.length}개 문제 준비됨</span>
+            <span className="text-text-secondary font-[400] text-[13px]">{problemCatalog.length}개 문제 수록</span>
           </div>
         </div>
 
