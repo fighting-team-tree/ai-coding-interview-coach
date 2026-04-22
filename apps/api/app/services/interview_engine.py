@@ -133,31 +133,26 @@ class InterviewEngine:
         if branch.flow_type == FlowType.fallback:
             prompts = [
                 (
-                    "코드 세부 구현보다 먼저, 어떤 접근으로 문제를 풀려고 했는지 "
-                    "한 문장으로 설명해볼래요?"
+                    "이 문제를 어떤 접근으로 풀려고 했는지 한 문장으로 설명해 주세요."
                 ),
                 (
-                    "그 접근의 시간복잡도를 어떻게 계산했는지, "
-                    "가장 큰 반복이 어디서 생기는지 짚어볼래요?"
+                    "가장 비용이 큰 반복이 어디인지 기준으로 시간복잡도를 설명해 주세요."
                 ),
-                "이 풀이에서 끝까지 지키려던 핵심 불변식이나 상태 정의는 무엇이었나요?",
-                "같은 문제를 다시 푼다면 어떤 더 단순한 구조로 재작성할지 설명해볼래요?",
+                "이 풀이에서 끝까지 유지해야 하는 핵심 상태나 불변식은 무엇인가요?",
+                "같은 문제를 다시 푼다면 어떤 구조로 더 단순하게 다시 짜겠어요?",
             ]
             intent = "핵심 개념 복구 질문"
         elif branch.flow_type == FlowType.plan_b:
             prompts = [
                 (
-                    f"{problem.pattern} 패턴을 택한 이유를, "
-                    "brute force 대비 장점 중심으로 설명해볼래요?"
+                    f"왜 {problem.pattern} 패턴을 선택했는지 brute force와 비교해서 설명해 주세요."
                 ),
-                "입력 크기가 10배 커지면 병목이 어디에 생길지 먼저 말해볼래요?",
+                "입력 크기가 10배 커지면 어디가 먼저 병목이 될까요?",
                 (
-                    "같은 정답을 내더라도 공간복잡도나 구현 복잡도 측면에서 "
-                    "trade-off가 있는 대안은 무엇인가요?"
+                    "같은 정답을 내더라도 공간복잡도나 구현 복잡도 측면에서 어떤 대안이 있나요?"
                 ),
                 (
-                    "이 풀이를 코드 리뷰 자리에서 방어한다면 "
-                    "가장 먼저 강조할 근거 한 가지는 무엇인가요?"
+                    "코드 리뷰에서 이 풀이를 방어해야 한다면 가장 먼저 어떤 근거를 말하겠어요?"
                 ),
             ]
             intent = "Scale-up 압박 질문"
@@ -181,19 +176,14 @@ class InterviewEngine:
                 EvidenceRef(kind="trap", label="Active trap", detail=trap_signal),
             )
             prompts = [
-                (
-                    f"현재 코드에서 `{trap_signal}` 신호가 보입니다. "
-                    "여기서 복잡도가 어떻게 바뀌는지 설명해볼래요?"
-                ),
                 trap_hint,
-                f"{trap_focus_label} 관점에서 지금 접근의 가장 취약한 케이스는 무엇인가요?",
+                f"{trap_focus_label} 기준으로 지금 접근의 가장 약한 지점을 설명해 주세요.",
+                "이 접근이 흔들리는 입력이나 반례를 하나 들어보세요.",
                 "이 코드를 다시 제출한다면 어떤 한 줄 또는 한 구조를 가장 먼저 바꾸겠나요?",
             ]
             intent = "취약점 기반 꼬리질문"
 
         prompt = prompts[min(turn_index, len(prompts) - 1)]
-        if answer and branch.flow_type != FlowType.fallback and turn_index > 0:
-            prompt = f"직전 답변을 바탕으로 이어가겠습니다. {prompt}"
 
         return QuestionPlan(
             prompt=prompt,

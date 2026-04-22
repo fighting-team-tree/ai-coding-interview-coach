@@ -620,7 +620,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
           <div className="linear-card flex flex-col h-full border-border-subtle bg-[#0f1011] overflow-hidden max-h-[850px]">
             <div className="flex justify-between items-start p-5 border-b border-border-subtle bg-[rgba(255,255,255,0.01)] shrink-0">
               <div>
-                <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase mb-1">질문 시연</div>
+                <div className="text-[10px] font-[510] tracking-[0.05em] text-[#8a8f98] uppercase mb-1">질문 흐름</div>
                 <h2 className="text-lg font-[510] tracking-[-0.01em] text-[#f7f8f8]">코드 근거 기반 면접 시연</h2>
               </div>
               <span className={`pill ${statusMeta.tone === 'success' ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20' : statusMeta.tone === 'warning' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : statusMeta.tone === 'active' ? 'bg-[#5e6ad2]/10 text-[#7170ff] border-[#5e6ad2]/20' : 'bg-[rgba(255,255,255,0.05)] text-text-secondary border-border-subtle'}`}>{statusMeta.label}</span>
@@ -630,7 +630,7 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
               <div className="flex justify-between items-center mb-2">
                 <strong className="font-[510] text-[#f7f8f8]">{activeFlow?.label ?? "코드 제출 대기"}</strong>
                 {session.question_mode === "deterministic" ? (
-                  <span className="badge-subtle bg-[rgba(255,255,255,0.1)] border-border-subtle text-text-primary">규칙 기반 질문 (시연 안정성 모드)</span>
+                  <span className="badge-subtle bg-[rgba(255,255,255,0.1)] border-border-subtle text-text-primary">시연 안정 모드</span>
                 ) : null}
               </div>
               <p className="leading-relaxed">
@@ -641,17 +641,14 @@ export function ProblemWorkspace({ problemId }: WorkspaceProps) {
 
             <div ref={chatLogRef} className="flex-1 overflow-y-auto p-5 space-y-4 min-h-[250px]">
               {session.turns.length === 0 ? (
-                <p className="text-text-tertiary text-sm text-center mt-10">코드를 제출하면 면접관이 첫 질문을 시작합니다.</p>
+                <p className="text-text-tertiary text-sm text-center mt-10">코드를 제출하면 첫 질문이 시작됩니다.</p>
               ) : (
                 session.turns.map((turn) => (
                   <div key={turn.id} className={`flex flex-col gap-1.5 p-4 rounded-lg text-[15px] leading-relaxed ${turn.role === 'assistant' ? 'bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] text-[#f7f8f8]' : 'bg-[#5e6ad2]/10 border border-[#5e6ad2]/20 text-[#f7f8f8] ml-8'}`}>
                     <div className="text-[11px] font-[510] uppercase tracking-wider text-text-tertiary">
-                      {turn.role === "assistant" ? "AI 면접관" : "내 답변"}
+                      {turn.role === "assistant" ? "면접 질문" : "내 답변"}
                     </div>
                     <div>{turn.content}</div>
-                    {turn.role === "assistant" && turn.intent ? (
-                      <div className="text-[13px] text-text-quaternary mt-2 pt-2 border-t border-[rgba(255,255,255,0.05)]">{turn.intent}</div>
-                    ) : null}
                   </div>
                 ))
               )}
