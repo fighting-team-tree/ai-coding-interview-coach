@@ -88,3 +88,7 @@ docs/.pdca-snapshots/
 .playwright-mcp/img/
 apps/web/playwright-report/
 apps/web/test-results/
+
+
+# AI CHAMPION
+docs/ai-champion-docx/
