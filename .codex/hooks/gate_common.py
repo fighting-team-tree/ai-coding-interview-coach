@@ -138,11 +138,16 @@ def _has_api_verification(commands: list[str]) -> bool:
 
 def build_session_start_context() -> str:
     return (
+        "Current repository operating mode:\n"
+        "- The top priority is preparing the Modoo Startup application and supporting planning documents.\n"
+        "- Prefer work under `docs/modoo_startup/` for new application drafts and structured notes.\n"
+        "- Existing AI_CHAMPION product assets should be treated as evidence of feasibility, not the primary output.\n"
         "Validation gate for this repository:\n"
         "- After changing files under apps/web, run `npm run verify:web` before ending the task.\n"
         "- After changing files under apps/api, run `npm run verify:api` before ending the task.\n"
         "- If both areas changed, run both or the root `npm run verify`.\n"
-        "- Docs-only and data-only changes do not require verification.\n"
+        "- Docs-only, proposal-only, and data-only changes do not require code verification.\n"
+        "- For docs-first work, review narrative clarity, business logic, and persuasion before considering technical expansion.\n"
         "- For commit work, read `.codex/workflows/commit-policy.md` and default to Korean commit message descriptions.\n"
         "- Before any commit, inspect status/diff, propose numbered commit options, and wait for explicit user approval.\n"
         "- Codex Default mode cannot use the Plan mode question tool, so commit approval must use text-based numbered choices.\n"
