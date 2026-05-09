@@ -1,30 +1,40 @@
-# Code Quality Rules (Claude Code)
+# Quality Rules (Claude Code)
 
-## 5차원 코드 리뷰
+## 문서 품질 5차원
 
-1. **Correctness** — 엣지 케이스, 레이스 컨디션, 경계값 오류
-2. **Readability** — 명명, 제어 흐름, 모듈 구성
-3. **Architecture** — 패턴 준수, 모듈 경계, 의존성
-4. **Security** — 입력 검증, 시크릿 노출, 인증/인가
-5. **Performance** — N+1 쿼리, 언바운드 루프, 비동기 처리
+현재 저장소의 1순위 산출물은 코드가 아니라 **"모두의 창업" 신청서와 관련 기획 문서**입니다.
+
+1. **Problem Clarity** — 누구의 어떤 문제를 해결하는지 선명한가
+2. **Value Proposition** — 기존 대안 대비 왜 더 나은지 분명한가
+3. **Market & Business** — 고객, 시장, 수익 모델이 자연스럽게 연결되는가
+4. **Feasibility** — 현재 팀과 자산으로 실행 가능성이 보이는가
+5. **Persuasion** — 2페이지 안에서 메시지가 논리적으로 설득되는가
 
 결과 분류: **Critical → Important → Suggestion**
 
-## 성능 목표
+## 문서 검토 기준
 
-STT 300ms + LLM 500–800ms + TTS 90ms ≤ **1초 합계**
+- 주장이 아니라 **근거 중심**으로 쓴다.
+- 기능 나열보다 **문제-해결-가치-확장성**의 흐름을 우선한다.
+- 한 문단은 하나의 메시지만 전달한다.
+- 심사위원이 처음 읽어도 이해되도록 내부 용어와 제품 용어를 풀어쓴다.
+- 기존 AI_CHAMPION 자산은 제품 설명이 아니라 **실행력 증거**로 배치한다.
 
-## 테스트
+## 코드 변경이 동반될 때
 
-- Arrange-Act-Assert 패턴
-- 버그 수정: Prove-It 패턴 (테스트 실패 먼저 → 수정)
-- 레벨: Unit → Integration → E2E
-- 커버: 정상 경로, 빈 입력, 경계값, 에러 경로
+문서 작업이 우선이지만, 코드 수정이 필요한 경우 아래 기준은 계속 유효하다.
 
-## 보안
+### 코드 리뷰 5차원
 
-- 입력 검증: allowlist 기반
-- 시크릿: 환경변수만, 코드 하드코딩 금지
-- CORS 명시적 설정
-- 의존성 감사: `npm audit`, `pip audit`
-- 인증/인가, IDOR, rate limiting 확인
+1. **Correctness** — 엣지 케이스, 경계값, 실제 동작 오류
+2. **Readability** — 명명, 제어 흐름, 모듈 구성
+3. **Architecture** — 패턴 준수, 모듈 경계, 의존성 방향
+4. **Security** — 입력 검증, 시크릿 노출, 인증/인가
+5. **Performance** — 사용자 체감 지연, 불필요한 반복, 병목
+
+### 코드 검증
+
+- 버그 수정은 가능하면 재현 근거 또는 관련 검증부터 확인한다.
+- `apps/web` 변경 시 `npm run verify:web`
+- `apps/api` 변경 시 `npm run verify:api`
+- 시크릿은 환경변수만 사용하고 코드 하드코딩을 금지한다.

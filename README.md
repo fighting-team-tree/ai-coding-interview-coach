@@ -1,15 +1,58 @@
-# AI_CHAMPION MVP Scaffold
+# 모두의 창업 제출 작업공간
 
-This repository now includes a runnable MVP scaffold for the coding-test-to-interview bridge:
+이 저장소의 현재 최우선 목적은 **"모두의 창업" 2페이지 도전 신청서 완성**입니다.
 
-- `apps/web`: Next.js frontend for problem selection, code submission, interview chat, and report review
-- `apps/api`: FastAPI backend with problem loading, AST analysis, Judge0 integration hooks, and a Pydantic AI-driven interview engine
-- `data/problems`: curated problem and trap data used to ground the interview flows
-- `docs/demo_script.md`: a deterministic recording plan for the demo video
+기존 `AI_CHAMPION` 개발 자산은 폐기 대상이 아니라, 신청서에서 아이디어의 실행 가능성과 차별성을 설명하기 위한 **근거 자료**로 유지합니다.
 
-## Recommended local setup
+## 현재 작업 원칙
 
-### 1. Backend
+- 기획, 분석, 문서 작성은 **신청서 설득력**을 기준으로 우선순위를 정합니다.
+- 새로운 아이디어 정리와 신청서 초안 작업은 `docs/modoo_startup/` 아래에서 진행합니다.
+- 기존 앱/데모/기술 자산은 제품 개발 그 자체보다 **문제 정의, 고객 가치, 사업화 가능성**을 뒷받침하는 참고 자산으로 사용합니다.
+- 주요 문서 방향 변경이나 구조 변경은 계획 브리핑과 사용자 승인 후 진행합니다.
+
+## 핵심 산출물
+
+- `docs/modoo_startup/`: 모두의 창업 신청서, 메모, 구조화된 초안
+- `AGENTS.md`: 현재 세션과 에이전트가 따라야 할 프로젝트 우선순위
+- `README.md`: 저장소의 현재 목적과 작업 방식을 설명하는 진입 문서
+
+## 아이디어 요약
+
+이 프로젝트는 기존의 **코딩테스트 → AI 모의면접 브릿지 플랫폼** 아이디어를 바탕으로,
+구직자에게는 실전형 훈련 경험을 제공하고 기업·교육기관에는 평가/코칭 도구로 확장 가능한 구조를 목표로 합니다.
+
+신청서에서는 아래 관점을 중심으로 정리합니다.
+
+- 어떤 문제를 해결하는가
+- 누구에게 어떤 가치를 제공하는가
+- 왜 지금 이 팀이 실행할 수 있는가
+- 어떤 방식으로 수익화·확장할 수 있는가
+
+## 기존 개발 자산 위치
+
+아래 자산은 신청서의 실행 가능성 근거로 활용할 수 있습니다.
+
+- `apps/web`: Next.js 기반 프런트엔드 프로토타입
+- `apps/api`: FastAPI 기반 백엔드 프로토타입
+- `data/problems`: 문제/함정 데이터
+- `tools/competition-video/`: 데모 영상 제작 파이프라인
+
+## 코드 작업이 필요할 때
+
+현재 저장소는 문서 작업이 우선이지만, 코드 변경이 필요한 경우에는 기존 검증 흐름을 유지합니다.
+
+- `apps/web` 변경 시: `npm run verify:web`
+- `apps/api` 변경 시: `npm run verify:api`
+- 둘 다 변경 시: `npm run verify`
+
+문서 중심 변경(`docs/`, `README.md`, 로컬 규칙 문서 등)은 빌드보다 **문맥 일관성, 설득 구조, 심사위원 관점의 전달력**을 우선 검토합니다.
+
+## 참고: 기존 개발/실행 명령
+
+기술 데모를 다시 확인해야 할 때만 사용합니다.
+
+### Backend
 
 ```bash
 cd apps/api
@@ -18,14 +61,14 @@ copy .env.example .env
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-From the repository root you can also use:
+또는 저장소 루트에서:
 
 ```bash
 npm run setup:api
 npm run dev:api
 ```
 
-### 2. Frontend
+### Frontend
 
 ```bash
 cd apps/web
@@ -34,86 +77,12 @@ copy .env.example .env.local
 npm run dev
 ```
 
-Frontend defaults to `http://localhost:8000` for the API.
+Frontend 기본 API 주소는 `http://localhost:8000` 입니다.
 
-## Verification commands
+## 참고: Codex hook
 
-Run the stack-specific verification commands before finishing code changes:
+프로젝트에는 `.codex/` 기반 훅 설정이 포함되어 있습니다.
 
-```bash
-npm run verify:web
-npm run verify:api
-```
-
-Or run both from the repository root:
-
-```bash
-npm run verify
-```
-
-`verify:web` runs ESLint, TypeScript, Vitest, and a production build.
-`verify:api` runs Ruff, Python bytecode compilation, and pytest.
-
-## Codex hook enforcement
-
-This repository now ships project-level Codex hook config in `.codex/`.
-
-- `.codex/config.toml` enables `codex_hooks`
-- `.codex/hooks/settings.toml` is the source of truth for platform and shell policy
-- `.codex/hooks/render_hooks.py` renders the active `.codex/hooks.json`
-- `.codex/hooks.json` injects the verification policy at session start
-- the `Stop` hook checks whether the relevant verification commands succeeded before the task ends
-
-Render the hook file after changing shell policy or moving between operating systems:
-
-```bash
-python .codex/hooks/render_hooks.py
-```
-
-Windows shell defaults to `auto`, which prefers `pwsh`, then `powershell`, then `cmd`.
-You can override it when needed:
-
-```bash
-python .codex/hooks/render_hooks.py --windows-shell pwsh
-python .codex/hooks/render_hooks.py --windows-shell cmd
-```
-
-## Deploy notes
-
-- Frontend is configured as a static Next.js export so it can be deployed to Firebase Hosting free tier.
-- Backend remains a standalone Python service and should be deployed outside Firebase.
-- Firebase config lives at the repository root in `firebase.json`.
-
-## Key environment variables
-
-Backend:
-
-- `APP_ENV`
-- `APP_HOST`
-- `APP_PORT`
-- `FRONTEND_ORIGIN`
-- `JUDGE0_BASE_URL`
-- `JUDGE0_API_TOKEN`
-- `INTERVIEW_MODEL`
-- `REPORT_MODEL`
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
-- `GOOGLE_API_KEY`
-
-Frontend:
-
-- `NEXT_PUBLIC_API_BASE_URL`
-
-## Competition video pipeline
-
-대회 제출용 자동 데모 영상 파이프라인을 추가했습니다.
-
-```bash
-npm run video:check
-npm run video:competition -- --scenario ai-champion-core --mode demo
-```
-
-- raw clip 생성: `tools/competition-video/record.mjs`
-- mp4 조합: `tools/competition-video/compose.mjs`
-- 시나리오 정의: `tools/competition-video/scenarios/`
-- 자세한 사용법: `tools/competition-video/README.md`
+- 코드 변경이 감지되면 적절한 검증 명령 실행이 요구됩니다.
+- 문서 중심 변경은 코드 검증보다 문서 품질 검토가 우선입니다.
+- 훅 설정 변경 후에는 필요 시 `python .codex/hooks/render_hooks.py` 로 갱신합니다.
