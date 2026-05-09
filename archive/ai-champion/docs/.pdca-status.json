@@ -1,0 +1,277 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-04-22T12:12:04.217Z",
+  "activeFeatures": [
+    "web",
+    "test",
+    "e2e",
+    "helpers",
+    "api"
+  ],
+  "primaryFeature": "web",
+  "features": {
+    "web": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-21T15:18:43.395Z",
+        "lastUpdated": "2026-04-22T12:12:04.217Z"
+      },
+      "lastFile": "C:\\Users\\fkjy1\\dev\\Hackathon\\AI_CHAMPION\\apps\\web\\components\\problem-workspace.tsx"
+    },
+    "test": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-21T15:23:14.304Z",
+        "lastUpdated": "2026-04-22T11:47:47.263Z"
+      },
+      "lastFile": "C:\\Users\\fkjy1\\dev\\Hackathon\\AI_CHAMPION\\apps\\web\\test\\app\\home-page.test.tsx"
+    },
+    "e2e": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-22T10:10:30.856Z",
+        "lastUpdated": "2026-04-22T12:10:55.700Z"
+      },
+      "lastFile": "C:\\Users\\fkjy1\\dev\\Hackathon\\AI_CHAMPION\\apps\\web\\test\\e2e\\home-to-report.spec.ts"
+    },
+    "helpers": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-22T11:47:53.936Z",
+        "lastUpdated": "2026-04-22T11:47:53.936Z"
+      },
+      "lastFile": "C:\\Users\\fkjy1\\dev\\Hackathon\\AI_CHAMPION\\apps\\web\\test\\e2e\\helpers\\interview-flow.ts"
+    },
+    "api": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-22T12:06:54.121Z",
+        "lastUpdated": "2026-04-22T12:06:54.121Z"
+      },
+      "lastFile": "C:\\Users\\fkjy1\\dev\\Hackathon\\AI_CHAMPION\\apps\\api\\app\\services\\llm_service.py"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-04-21T14:39:14.213Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-04-22T12:12:04.217Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-04-21T15:18:43.395Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:19:12.320Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:21:50.525Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:21:58.305Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:22:04.713Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:22:08.919Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:22:16.099Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:22:20.734Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:22:28.516Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:23:14.304Z",
+      "feature": "test",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T15:23:36.423Z",
+      "feature": "test",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:20.179Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:22.154Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:25.487Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:27.428Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:28.941Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:30.856Z",
+      "feature": "e2e",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T10:10:32.088Z",
+      "feature": "test",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T11:46:35.625Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T11:47:01.138Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T11:47:33.142Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T11:47:47.263Z",
+      "feature": "test",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T11:47:53.936Z",
+      "feature": "helpers",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:06:54.121Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:09:17.141Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:09:31.637Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:09:40.270Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:09:57.161Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:10:08.119Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:10:55.700Z",
+      "feature": "e2e",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-22T12:12:04.217Z",
+      "feature": "web",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}

@@ -1,85 +1,13 @@
-# AGENTS.md
+# AGENTS.md - 모두의 창업 (Modoo Startup) 환경
 
-<!-- ALINE:ONECONTEXT:START -->
-## Aline OneContext - Proactive History Search
-
-When the user asks about existing code, features, past decisions, debugging context,
-or anything that might have been discussed in previous conversations, proactively
-use the `onecontext` skill (`/onecontext`) to search Aline history before answering.
-Don't wait for the user to explicitly ask you to search history.
-
-Scenarios to proactively search:
-- User asks "why was X implemented this way?" or references past decisions
-- User is debugging and needs historical context about a feature or bug
-- User references a function/feature/variable that may have been discussed before
-- User asks about past conversations, changes, or project history
-<!-- ALINE:ONECONTEXT:END -->
-
-## Codex Bootstrap
-
-This repository is currently document-first. Before proposing or editing files, load
-the minimum relevant guidance from `.codex/`.
-
-Always read these first for meaningful work:
-- `.codex/context/project.md`
-- `.codex/workflows/execution-policy.md`
-
-Read this whenever the task touches commit preparation or commit execution:
-- `.codex/workflows/commit-policy.md`
-
-Read these when the task touches proposal or planning documents:
-- `.codex/workflows/docs-authoring.md`
-- `.codex/checklists/proposal-review.md`
-
-## Agent Skills Mapping
-
-The `addyosmani/agent-skills` pack is installed in this workspace under `.codex/skills`.
-Use it as Codex-native workflow guidance, not as Claude-only metadata.
-
-- Treat `skills/` as the primary integration surface. When a task clearly matches one of those skills, open the relevant `SKILL.md` and follow it.
-- Do not assume `.claude/commands/` are executable in Codex. They are intent labels for Claude Code, not native Codex slash commands.
-- Interpret the command names as workflow triggers in Codex:
-  - `spec` -> `spec-driven-development`
-  - `plan` -> `planning-and-task-breakdown`
-  - `build` -> `incremental-implementation` + `test-driven-development`
-  - `test` -> `test-driven-development`
-  - `review` -> `code-review-and-quality`
-  - `ship` -> `shipping-and-launch`
-- Prefer adding the matching skill workflow to the current task rather than echoing command names back to the user.
-- Treat `agents/` as reusable review personas and role prompts, not as automatically executable Codex sub-agents. They may inform local reasoning or spawned sub-agents when delegation is explicitly appropriate, but they are not a 1:1 runtime mapping.
-- Treat `hooks/` as tool-specific lifecycle integration examples. Do not assume they are portable to this repository's Codex hook system without explicit adaptation.
-- When a task is non-trivial and no clearer repository-specific rule overrides it, default to this sequence:
-  - `spec-driven-development`
-  - `planning-and-task-breakdown`
-  - `incremental-implementation`
-  - `test-driven-development`
-  - `code-review-and-quality`
+## Context Bootstrap
+프로젝트의 목표가 "모두의 창업" 제출(2페이지 분량 도전 신청서 완성)로 전환되었습니다. 모든 에이전트는 기획, 분석, 문서 작성 시 이 목적을 최우선으로 해야 합니다.
 
 ## Project-Specific Rules
-
-- **Design Mandate:** ALL agents must prioritize `DESIGN.md` for any UI/UX modifications. The "Linear Style" (dark-mode-first, precision engineering) is the standard for this project.
-- Prioritize product and architecture coherence over speculative implementation.
-- Treat the journey from coding test submission to interview practice as the top-level user flow.
-- Proposal and planning output must align with `docs/proposal_template.md`.
-- Preserve original files under `docs/ai-champion-hwp/`. Edit derived Markdown or top-level planning docs first.
-- For code changes under `apps/web`, run `npm run verify:web` before treating the task as complete.
-- For code changes under `apps/api`, run `npm run verify:api` before treating the task as complete.
-- For cross-stack changes, run both or the root `npm run verify`.
+- **기획 우선:** 코드를 즉시 작성하거나 수정하기보다는 "이 아이디어가 2페이지 분량의 신청서에서 어떻게 매력적이고 논리적으로 보일지"를 먼저 고민하고 제안하세요.
+- **작업 공간:** 새로운 아이디어 구상 및 신청서 작성은 반드시 `docs/modoo_startup/` 폴더 내에서 진행합니다.
+- **기존 아이디어 연계:** 기존에 개발하던 "코딩테스트 → AI 모의면접 브릿지 플랫폼" 아이디어를 유지하되, 이를 통해 어떤 경제적/사회적 가치를 창출할 수 있는지(예: B2B 채용 솔루션 납품, 교육 기관 연계 등) 비즈니스 관점에서 발전시키세요.
 
 ## Approval Policy
-
-For major edits, multi-file changes, structural changes, or any commit:
-1. Inspect the current state first.
-2. Present a short implementation plan with target files and intended outcomes.
-3. Wait for explicit approval.
-4. Execute only after approval.
-
-Do not combine plan briefing and execution in the same turn when the change is substantial.
-
-## Commit Rules
-
-- Codex should default to Korean commit message descriptions unless the user explicitly asks for English.
-- Preferred commit message format is Conventional Commits style: `<type>: 한국어 설명`.
-- Before any commit, inspect `git status` and diff, group changes logically, and present commit options to the user.
-- Commit approval must use a text-based selection step with numbered options because Codex Default mode cannot use the Plan mode question tool.
-- Do not run `git add` or `git commit` until the user explicitly selects an option.
+- 주요 기획 문서 내용 변경이나 프로젝트 구조 변경 전, 구현 계획(`Implementation Plan`) 아티팩트를 통해 사용자에게 상세 브리핑을 하고 명시적인 승인을 받으세요.
+- 동시 실행 금지: 계획 제안과 실제 실행(수정/커밋)을 한 번에 진행하지 마세요.
