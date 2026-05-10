@@ -10,7 +10,7 @@ export const interviewAnswers = [
 export async function openFeaturedProblem(page: Page) {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "같은 흐름으로 확인할 추가 문제" }),
+    page.getByRole("heading", { name: "같은 운영 흐름으로 반복할 수 있는 문제들" }),
   ).toBeVisible();
   await page.locator("[data-video-cta='featured-problem']").first().click();
   await expect(page).toHaveURL(/\/problems\/two-pointer-window$/);
@@ -26,12 +26,12 @@ export async function completeInterviewFlow(page: Page) {
     page.getByRole("button", { name: "코드 제출" }).click(),
   ]);
 
-  await expect(page.getByRole("heading", { name: "일반 심화 질문" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "코드 기반 코칭 질문" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "질문을 뒷받침하는 최소 근거" })).toBeVisible();
   await expect(page.getByText("중첩 반복문 또는 모든 구간 합 탐색", { exact: true })).toBeVisible();
 
   const answerBox = page.getByPlaceholder(
-    "풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요.",
+    "풀이 근거와 시간복잡도를 짧게 설명해보세요.",
   );
   for (const answer of interviewAnswers) {
     await expect(answerBox).toBeEnabled();
