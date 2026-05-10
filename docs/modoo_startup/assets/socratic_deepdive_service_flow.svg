@@ -1,0 +1,78 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#F8FAFC"/>
+
+  <text x="800" y="88" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="40" font-weight="700" fill="#0F172A">코딩테스트와 기술면접 사이를 연결하는 AI 훈련 흐름</text>
+  <text x="800" y="132" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="500" fill="#475569">정답 여부가 아니라, 제출 코드의 이해와 설명 역량을 훈련합니다.</text>
+
+  <rect x="80" y="210" width="240" height="360" rx="28" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="200" cy="258" r="28" fill="#DBEAFE"/>
+  <text x="200" y="267" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#1D4ED8">1</text>
+  <text x="200" y="322" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">풀이 코드</text>
+  <text x="200" y="356" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">제출</text>
+  <text x="200" y="392" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">수강생이 코딩 문제</text>
+  <text x="200" y="420" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">풀이 코드를 업로드해</text>
+  <text x="200" y="448" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">면접을 시작합니다</text>
+  <rect x="136" y="462" width="128" height="70" rx="14" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <path d="M164 485H236" stroke="#2563EB" stroke-width="5" stroke-linecap="round"/>
+  <path d="M164 507H220" stroke="#2563EB" stroke-width="5" stroke-linecap="round"/>
+
+  <rect x="380" y="210" width="240" height="360" rx="28" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="500" cy="258" r="28" fill="#EDE9FE"/>
+  <text x="500" y="267" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#7C3AED">2</text>
+  <text x="500" y="322" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">질문 포인트</text>
+  <text x="500" y="356" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">추출</text>
+  <text x="500" y="390" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">자료구조·복잡도·</text>
+  <text x="500" y="418" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">예외처리·경계값 등</text>
+  <text x="500" y="446" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="19" font-weight="500" fill="#475569">질문 단서를 분석</text>
+  <circle cx="500" cy="496" r="34" fill="#F5F3FF" stroke="#C4B5FD"/>
+  <circle cx="489" cy="490" r="10" stroke="#7C3AED" stroke-width="5"/>
+  <path d="M513 513L527 527" stroke="#7C3AED" stroke-width="5" stroke-linecap="round"/>
+
+  <rect x="680" y="210" width="240" height="360" rx="28" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="800" cy="258" r="28" fill="#E0F2FE"/>
+  <text x="800" y="267" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#0369A1">3</text>
+  <text x="800" y="322" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">코드 기반</text>
+  <text x="800" y="356" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">모의면접</text>
+  <text x="800" y="392" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="500" fill="#475569">제출 코드에 기반한</text>
+  <text x="800" y="422" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="500" fill="#475569">실전형 꼬리질문을 진행</text>
+  <path d="M752 502C752 478 772 458 796 458H804C828 458 848 478 848 502V506C848 530 828 550 804 550H796C772 550 752 530 752 506V502Z" fill="#F0F9FF" stroke="#7DD3FC" stroke-width="2"/>
+  <path d="M775 488H824" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round"/>
+  <path d="M775 508H811" stroke="#0EA5E9" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="836" cy="528" r="8" fill="#0EA5E9"/>
+
+  <rect x="980" y="210" width="240" height="360" rx="28" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="1100" cy="258" r="28" fill="#DCFCE7"/>
+  <text x="1100" y="267" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#16A34A">4</text>
+  <text x="1100" y="322" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">3축 피드백</text>
+  <text x="1100" y="356" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">리포트</text>
+  <text x="1100" y="392" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="500" fill="#475569">문제 이해도 · 구현 사고력 ·</text>
+  <text x="1100" y="422" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="500" fill="#475569">설명 능력을 기준으로 진단</text>
+  <rect x="1044" y="468" width="112" height="74" rx="14" fill="#F0FDF4" stroke="#BBF7D0"/>
+  <path d="M1064 523L1087 501L1100 513L1136 480" stroke="#16A34A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="1280" y="210" width="240" height="360" rx="28" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="1400" cy="258" r="28" fill="#FEF3C7"/>
+  <text x="1400" y="267" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#D97706">5</text>
+  <text x="1400" y="322" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">반복 가능한</text>
+  <text x="1400" y="356" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">면접 훈련</text>
+  <text x="1400" y="392" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="700" fill="#0F172A">멘토 부담 ↓</text>
+  <text x="1400" y="422" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="700" fill="#0F172A">피드백 품질 ↑</text>
+  <text x="1400" y="452" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="20" font-weight="700" fill="#0F172A">취업 대응력 ↑</text>
+  <path d="M1350 530L1380 500L1400 518L1450 468" stroke="#F59E0B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M320 390H370" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M358 376L380 390L358 404" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M620 390H670" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M658 376L680 390L658 404" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M920 390H970" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M958 376L980 390L958 404" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M1220 390H1270" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M1258 376L1280 390L1258 404" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="120" y="664" width="1360" height="118" rx="24" fill="#E2E8F0"/>
+  <text x="800" y="716" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">소크라틱 딥다이브는 수강생의 실제 제출 코드를 바탕으로 질문과 피드백을 자동화해</text>
+  <text x="800" y="756" text-anchor="middle" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="28" font-weight="700" fill="#0F172A">교육기관의 기술면접 훈련을 더 일관되고 반복 가능한 방식으로 운영하도록 돕습니다.</text>
+</svg>
