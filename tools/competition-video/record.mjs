@@ -26,7 +26,7 @@ import {
 const HOME_PORT = 3100;
 const API_PORT = 8110;
 const ANSWER_PLACEHOLDER =
-  "풀이 접근, 시간복잡도, 핵심 판단 기준과 왜 그런 선택을 했는지 설명해보세요.";
+  "풀이 근거와 시간복잡도를 짧게 설명해보세요.";
 const INTERVIEW_PANEL_TARGET_RATIO = 0.3;
 const ANSWER_COMPOSER_TARGET_RATIO = 0.4;
 const REPORT_PANEL_TARGET_RATIO = 0.24;
@@ -115,7 +115,7 @@ function buildTitleCardHtml({ title, subtitle, details }) {
   <body>
     <main>
       <section>
-        <div class="eyebrow">Automated Demo Video</div>
+        <div class="eyebrow">Representative Session</div>
         <h1>${title}</h1>
         <p>${subtitle}</p>
         <ul>${detailItems}</ul>
@@ -136,27 +136,11 @@ async function installCaptionOverlay(page) {
     content: `
       #competition-video-caption {
         position: fixed;
-        left: 50%;
-        bottom: 42px;
-        transform: translateX(-50%);
-        width: min(1180px, calc(100vw - 96px));
-        padding: 18px 24px;
-        border-radius: 18px;
-        background: rgba(15, 16, 17, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #f7f8f8;
-        font-family: Inter, "Segoe UI", system-ui, sans-serif;
-        font-size: 28px;
-        line-height: 1.45;
-        font-weight: 510;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
-        z-index: 2147483647;
+        inset: auto auto -9999px -9999px;
+        width: 1px;
+        height: 1px;
         opacity: 0;
-        transition: opacity 180ms ease;
         pointer-events: none;
-      }
-      #competition-video-caption.visible {
-        opacity: 1;
       }
     `,
   });
@@ -493,8 +477,8 @@ async function recordDemoClip(browser, viewport, rawDir, scenario, baseUrl) {
       page.getByRole("button", { name: "코드 제출" }).click(),
     ]);
 
-    await page.getByRole("heading", { name: "일반 심화 질문" }).waitFor();
-    await page.getByRole("heading", { name: "왜 이런 질문이 나왔는지" }).waitFor();
+    await page.getByRole("heading", { name: "코드 기반 코칭 질문" }).waitFor();
+    await page.getByRole("heading", { name: "질문을 뒷받침하는 최소 근거" }).waitFor();
     await revealInterviewState(page, { focusAnswerComposer: true });
     await sleep(scenario.demo.holds.afterSubmitMs);
 

@@ -20,6 +20,59 @@ async function readMetadata(bundleDir) {
   return { metadataPath, metadata: JSON.parse(raw) };
 }
 
+function formatAssTimestamp(ms) {
+  const totalMs = Math.max(0, Math.round(ms));
+  const hours = Math.floor(totalMs / 3_600_000);
+  const minutes = Math.floor((totalMs % 3_600_000) / 60_000);
+  const seconds = Math.floor((totalMs % 60_000) / 1000);
+  const centiseconds = Math.floor((totalMs % 1000) / 10);
+  return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(centiseconds).padStart(2, "0")}`;
+}
+
+function escapeAssText(text) {
+  return String(text ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/{/g, "\\{")
+    .replace(/}/g, "\\}")
+    .replace(/\n/g, "\\N");
+}
+
+function escapeAssPath(targetPath) {
+  return targetPath.replace(/\\/g, "/").replace(":", "\\:");
+}
+
+async function writeCaptionAss(bundleDir, metadata, audioMetadata) {
+  const captionPath = path.join(bundleDir, "captions.ass");
+  const demoCues = (audioMetadata.cues ?? []).filter((cue) => cue.section === "demo" && !cue.skipped && cue.text);
+
+  const dialogueLines = demoCues.map((cue, index) => {
+    const nextCue = demoCues[index + 1];
+    const endMs = nextCue ? Math.max(cue.startMs + 300, nextCue.startMs - 80) : cue.endMs ?? cue.startMs + cue.durationMs;
+    return `Dialogue: 0,${formatAssTimestamp(cue.startMs)},${formatAssTimestamp(endMs)},Default,,0,0,0,,${escapeAssText(cue.text)}`;
+  });
+
+  const content = [
+    "[Script Info]",
+    "ScriptType: v4.00+",
+    "PlayResX: 1920",
+    "PlayResY: 1080",
+    "WrapStyle: 2",
+    "ScaledBorderAndShadow: yes",
+    "",
+    "[V4+ Styles]",
+    "Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding",
+    "Style: Default,Segoe UI,30,&H00FFFFFF,&H00FFFFFF,&H00000000,&HAA000000,0,0,0,0,100,100,0,0,3,1.6,0,2,72,72,34,1",
+    "",
+    "[Events]",
+    "Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text",
+    ...dialogueLines,
+    "",
+  ].join("\n");
+
+  await fs.writeFile(captionPath, content, "utf-8");
+  return captionPath;
+}
+
 function resolveBundleSelection(args, scenarioId) {
   if (args.bundle) {
     return path.resolve(args.bundle);
@@ -51,6 +104,7 @@ export async function composeCompetitionVideo(options = {}) {
     scenario,
     metadata,
   });
+  const captionAssPath = await writeCaptionAss(bundleDir, metadata, audioAssets);
 
   const ffmpegArgs = [
     "-y",
@@ -105,7 +159,7 @@ export async function composeCompetitionVideo(options = {}) {
 
   ffmpegArgs.push(
     "-vf",
-    "fps=30,format=yuv420p",
+    `ass='${escapeAssPath(captionAssPath)}',fps=30,format=yuv420p`,
     "-c:v",
     "libx264",
     "-preset",
