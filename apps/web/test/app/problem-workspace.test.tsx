@@ -72,11 +72,11 @@ describe("ProblemWorkspace", () => {
 
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
-    expect(await screen.findByRole("heading", { name: "코드를 제출하면 분기 시연이 시작됩니다" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "코드를 제출하면 개인화 질문이 시작됩니다" })).toBeInTheDocument();
     expect(screen.getByText("느린 코드").closest("button")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "왜 이런 질문이 나왔는지" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "질문을 뒷받침하는 최소 근거" })).toBeInTheDocument();
     expect(screen.getByText("positive numbers")).toBeInTheDocument();
-    expect(screen.getByText("질문이 확인하는 기준")).toBeInTheDocument();
+    expect(screen.getByText("강사가 확인할 기준")).toBeInTheDocument();
     expect(screen.getByTestId("editor").closest("div")).toBeInTheDocument();
     expect(document.querySelector("[data-video-interview-panel]")).not.toBeNull();
     expect(document.querySelector("[data-video-chat-log]")).not.toBeNull();
@@ -158,7 +158,7 @@ describe("ProblemWorkspace", () => {
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
     expect(
-      await screen.findByRole("heading", { name: "코드 기반 면접 시연" }),
+      await screen.findByRole("heading", { name: "코드 기반 코칭 질문" }),
     ).toBeInTheDocument();
     expect(scrollToSpy).toHaveBeenCalledWith({
       top: 0,
@@ -225,9 +225,9 @@ describe("ProblemWorkspace", () => {
 
     render(<ProblemWorkspace problemId="two-pointer-window" />);
 
-    expect(await screen.findByText("면접 질문")).toBeInTheDocument();
+    expect(await screen.findByText("코칭 질문")).toBeInTheDocument();
     expect(screen.queryByText("AI 면접관")).not.toBeInTheDocument();
-    const chatBubble = screen.getByText("면접 질문").parentElement;
+    const chatBubble = screen.getByText("코칭 질문").parentElement;
     expect(chatBubble).not.toBeNull();
     expect(
       within(chatBubble as HTMLElement).getByText("지금 구현의 최악 시간복잡도를 수식으로 설명해 주세요."),
