@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Champion | 기술면접 시연",
+  title: "AI Champion | 교육기관 면접 훈련 시스템",
   description:
-    "제출한 코드에 따라 질문 흐름과 피드백이 달라지는 기술면접 시연",
+    "학습자 코드 제출부터 코드 기반 꼬리 질문, 3축 피드백, 강사 코칭 메모까지 이어지는 교육기관용 면접 훈련 시스템",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -29,17 +29,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
               <div className="flex flex-col">
                 <span className="text-brand-indigo text-[10px] font-[510] tracking-widest">
-                  기술면접 시연
+                  교육기관 면접 훈련
                 </span>
                 <strong className="text-text-primary font-[510] tracking-tight">AI Champion</strong>
               </div>
             </Link>
             <nav className="flex items-center gap-6">
               <Link href="/#practice-problems" className="text-text-secondary hover:text-text-primary text-[13px] font-[510] transition-colors">
-                문제 둘러보기
+                훈련 문제
               </Link>
               <Link href="/problems/two-pointer-window" className="btn-ghost text-[13px] py-1.5 px-3">
-                대표 문제 시작
+                대표 세션 시작
               </Link>
             </nav>
           </div>
