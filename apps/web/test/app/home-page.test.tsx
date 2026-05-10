@@ -15,23 +15,23 @@ vi.mock("next/link", () => ({
 }));
 
 describe("HomePage", () => {
-  it("renders the immediate demo-entry home with a featured problem CTA", () => {
+  it("renders the institution training narrative with a representative session CTA", () => {
     render(<HomePage />);
 
     expect(
       screen.getAllByRole("heading", { name: problemCatalog[0].title }).length,
     ).toBeGreaterThanOrEqual(1);
     expect(
-      screen.getByRole("heading", { name: "코드 신호에 따라 질문 흐름이 달라집니다." }),
+      screen.getByRole("heading", { name: "강사의 반복 질문을 학습자별 훈련 세션으로 바꿉니다." }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "같은 흐름을 더 적은 운영 부담으로 반복합니다" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "같은 흐름으로 확인할 추가 문제" })).toBeInTheDocument();
-    expect(screen.getByText("대표 시연")).toBeInTheDocument();
-    expect(screen.getByText("운영 기준")).toBeInTheDocument();
-    expect(screen.getByText("다른 연습 문제")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "한 번의 훈련 후, 강사는 다음에 무엇을 물어볼지 바로 압니다." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "같은 운영 흐름으로 반복할 수 있는 문제들" })).toBeInTheDocument();
+    expect(screen.getByText("부트캠프·교육기관용 면접 훈련 시스템")).toBeInTheDocument();
+    expect(screen.getByText("운영 루프")).toBeInTheDocument();
+    expect(screen.getByText("훈련 문제")).toBeInTheDocument();
     expect(screen.getByText(problemCatalog[1].title)).toBeInTheDocument();
     const featuredProblemCtas = screen
-      .getAllByRole("link", { name: "대표 문제 시작하기" })
+      .getAllByRole("link", { name: "대표 학습자 세션 보기" })
       .filter((link) => link.getAttribute("data-video-cta") === "featured-problem");
     expect(featuredProblemCtas.length).toBeGreaterThanOrEqual(1);
 

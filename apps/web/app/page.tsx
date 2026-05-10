@@ -7,47 +7,39 @@ const DIFFICULTY_LABEL = {
   hard: "심화",
 } as const;
 
-const homeMetrics = [
+const buyerPains = [
+  "합격 코드는 있어도 풀이 근거를 말하지 못합니다.",
+  "강사는 제출 코드마다 꼬리 질문을 새로 만들기 어렵습니다.",
+  "운영자는 약한 축을 세션 뒤에야 확인합니다.",
+] as const;
+
+const operatingLoop = [
   {
-    label: "세션 비용",
-    value: "≤ $0.10",
-    note: "30명 기준 모의면접을 약 $3로 반복 운영",
+    eyebrow: "01",
+    title: "대표 문제로 훈련을 시작",
+    detail: "학습자는 실제 면접처럼 코드를 제출합니다.",
   },
   {
-    label: "강사 시간 절감",
-    value: "15h → 0h",
-    note: "강사 1명이 맡던 초반 질의응답을 자동 진행",
+    eyebrow: "02",
+    title: "제출 코드에서 신호를 포착",
+    detail: "코드 신호가 질문 흐름을 정합니다.",
   },
   {
-    label: "질문 통제",
-    value: "이탈 ≤ 5%",
-    note: "문제 범위를 벗어나지 않도록 질문 유지",
+    eyebrow: "03",
+    title: "코드 기반 꼬리 질문 진행",
+    detail: "복잡도, 불변식, 판단 근거를 말하게 합니다.",
+  },
+  {
+    eyebrow: "04",
+    title: "강사가 바로 코칭할 리포트 정리",
+    detail: "3축 피드백과 다음 코칭 메모를 남깁니다.",
   },
 ] as const;
 
-const operatingCostBars = [
-  { label: "강사 직접 운영 (30명)", unit: "15h", percent: 100 },
-  { label: "본 시스템 (30세션)", unit: "$3", percent: 3 },
-] as const;
-
-const controlHighlights = ["문제 기준", "코드 신호", "질문 방향", "제한 범위"] as const;
-
-const proofSteps = [
-  {
-    eyebrow: "Step 01",
-    title: "문제를 고른 뒤 코드를 제출합니다.",
-    detail: "같은 문제라도 제출한 코드에 따라 첫 질문이 달라집니다.",
-  },
-  {
-    eyebrow: "Step 02",
-    title: "질문은 통제 범위 안에서만 이어집니다.",
-    detail: "복잡도, 판단 근거, 개선 방향을 순서대로 확인합니다.",
-  },
-  {
-    eyebrow: "Step 03",
-    title: "세션이 끝나면 3축 피드백으로 정리됩니다.",
-    detail: "세 축 점수와 다음 연습 포인트를 한 번에 정리합니다.",
-  },
+const buyerTakeaways = [
+  { label: "대표 세션", value: "코드 제출이 질문 흐름을 정합니다." },
+  { label: "3축 피드백", value: "정의·해결·설명 중 약한 축이 보입니다." },
+  { label: "강사 메모", value: "다음 코칭 질문과 연습 포인트가 남습니다." },
 ] as const;
 
 export default function HomePage() {
@@ -55,19 +47,20 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-16 px-6 pb-32 pt-16 text-text-primary">
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end">
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-end">
         <div className="flex flex-col gap-6">
           <span className="text-brand-indigo text-[13px] font-[510] uppercase tracking-[0.18em]">
-            대표 시연
+            부트캠프·교육기관용 면접 훈련 시스템
           </span>
           <div className="flex flex-col gap-4">
             <h1 className="max-w-3xl text-[64px] font-[510] leading-[1] tracking-[-1.408px] text-text-primary">
-              코드 신호에 따라
-              <span className="block text-text-secondary">질문 흐름이 달라집니다.</span>
+              강사의 반복 질문을
+              <span className="block text-text-secondary">학습자별 훈련 세션으로 바꿉니다.</span>
             </h1>
             <p className="max-w-2xl text-[18px] leading-[1.65] text-text-secondary tracking-[-0.165px]">
-              심사위원이 바로 봐야 하는 것은 대화 장면이 아니라, 제출한 코드가 어떤 질문을
-              부르고 세션 끝에 어떤 피드백으로 정리되는지입니다.
+              코딩테스트 이후의 가장 큰 공백은 정답 코드가 아니라, 왜 그렇게 풀었는지 말하는
+              훈련입니다. 이 화면은 한 명의 대표 학습자가 코드를 제출하고, 코드 기반 질문을
+              받은 뒤, 강사가 바로 볼 수 있는 3축 리포트로 이어지는 흐름을 보여줍니다.
             </p>
           </div>
 
@@ -77,227 +70,118 @@ export default function HomePage() {
               data-video-cta="featured-problem"
               className="btn-primary px-6 py-3 text-[15px]"
             >
-              대표 문제 시작하기
+              대표 학습자 세션 보기
             </Link>
-            <Link className="btn-ghost px-5 py-3 text-[15px]" href="#practice-problems">
-              문제 둘러보기
+            <Link className="btn-ghost px-5 py-3 text-[15px]" href="#operating-loop">
+              운영 흐름 확인
             </Link>
           </div>
         </div>
 
-        <aside className="linear-card flex flex-col gap-4 p-6">
+        <aside className="linear-card flex flex-col gap-5 p-6">
           <div className="flex flex-col gap-2">
             <span className="text-[11px] font-[510] uppercase tracking-[0.14em] text-text-tertiary">
-              데모에서 확인할 것
+              기관의 반복 부담
             </span>
             <strong className="text-[20px] font-[590] tracking-[-0.24px] text-text-primary">
-              질문 통제와 3축 피드백이 한 세션으로 이어지는지
+              개인화 면접 훈련은 필요하지만, 강사의 시간은 반복 질문에 묶입니다.
             </strong>
           </div>
-          <div className="grid gap-3">
-            {proofSteps.map((step) => (
-              <div
-                key={step.title}
-                className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-4"
-              >
-                <span className="text-[11px] font-[510] uppercase tracking-[0.12em] text-brand-indigo">
-                  {step.eyebrow}
-                </span>
-                <strong className="mt-2 block text-[15px] font-[510] text-text-primary">
-                  {step.title}
-                </strong>
-                <p className="mt-1 text-[14px] leading-[1.6] text-text-secondary">{step.detail}</p>
-              </div>
-            ))}
-          </div>
-        </aside>
-      </section>
-
-      <section className="linear-card p-1 relative overflow-hidden">
-        <div className="bg-panel-dark rounded-[calc(var(--radius-card)-4px)] p-10 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div className="flex flex-col justify-between gap-10 bg-transparent">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-3">
-                  <span className={`pill ${featuredProblem.difficulty === 'easy' ? 'text-status-emerald border-status-emerald/30' : featuredProblem.difficulty === 'hard' ? 'text-security-lavender border-security-lavender/30' : ''}`}>
-                    {DIFFICULTY_LABEL[featuredProblem.difficulty]}
-                  </span>
-                  <span className="badge-subtle bg-white/[0.02] border-white/[0.05] text-text-secondary">{featuredProblem.pattern}</span>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <h2 className="text-[32px] font-[400] leading-[1.13] tracking-[-0.704px] text-text-primary">
-                    {featuredProblem.title}
-                  </h2>
-                  <p className="text-[16px] leading-[1.6] text-text-secondary">
-                    {featuredProblem.elevatorPitch}
-                  </p>
-                </div>
-                <p className="max-w-xl text-[15px] leading-[1.7] text-text-secondary">
-                  첫 장면에서는 설명보다 진입이 먼저 보이도록 두고, 이 패널에서 느린 풀이와 안정적인
-                  풀이가 어떤 다른 질문 흐름을 만드는지 바로 읽히게 합니다.
-                </p>
-                <ul className="grid gap-3 text-[14px] text-text-secondary">
-                  {proofSteps.map((step) => (
-                    <li
-                      key={step.eyebrow}
-                      className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-4"
-                    >
-                      <strong className="block text-[14px] font-[510] text-text-primary">
-                        {step.title}
-                      </strong>
-                      <span className="mt-1 block leading-[1.6]">{step.detail}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex flex-col rounded-panel border border-white/[0.08] bg-[#0a0b0d] p-8">
-                <div className="flex justify-between items-start mb-6 relative z-10">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-2.5 w-2.5 rounded-full bg-status-emerald/80" />
-                      <span className="text-[12px] text-text-primary uppercase tracking-[0.1em] font-[590]">대표 시연 흐름</span>
-                    </div>
-                    <h3 className="text-[20px] font-[590] tracking-[-0.24px] text-white">질문이 달라지는 기준</h3>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-8 relative z-10">
-                  {controlHighlights.map((item) => (
-                    <span key={item} className="pill bg-brand-indigo/10 border-brand-indigo/20 text-brand-indigo text-[11px] font-[590]">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex flex-col gap-0 relative z-10 flex-1">
-                  {(featuredProblem.comparisonPreview ?? []).map((preview, idx, arr) => (
-                    <div key={preview.label} className="flex gap-4 relative">
-                      <div className="flex flex-col items-center mt-2">
-                        <div className="w-2.5 h-2.5 rounded-full border border-marketing-black bg-brand-indigo/80 relative z-10"></div>
-                        {idx !== arr.length - 1 && (
-                          <div className="w-px h-full bg-white/[0.08] my-1"></div>
-                        )}
-                      </div>
-                      <div className={`flex flex-col gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 flex-1 ${idx !== arr.length - 1 ? 'mb-6' : ''}`}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-brand-indigo text-[11px] font-[590] uppercase tracking-[0.05em] px-2 py-0.5 bg-brand-indigo/10 rounded-micro">{preview.label}</span>
-                        </div>
-                        <strong className="text-[15px] font-[510] text-text-primary leading-tight">{preview.expectedFlow}</strong>
-                        <p className="text-[14px] text-text-secondary leading-snug">{preview.purpose}</p>
-                        <div className="mt-2 bg-[#050505] rounded-md border border-white/[0.05] p-3 font-mono">
-                          <div className="text-[10px] text-text-tertiary mb-1 flex items-center gap-2">
-                            <span className="text-accent-violet">❯</span> 포착된 신호
-                          </div>
-                          <code className="text-[12px] text-[#a5b4fc] block">
-                            {preview.signal}
-                          </code>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-border-subtle relative z-10">
-                  <Link 
-                    href={`/problems/${featuredProblem.id}`}
-                    className="w-full btn-primary bg-brand-indigo text-white hover:bg-accent-hover font-[590] py-3 text-[15px]"
-                  >
-                    대표 문제 시작하기
-                  </Link>
-                </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Proof Steps */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <article className="linear-card p-8 flex flex-col gap-8 shadow-sm hover:bg-white/[0.05] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-          <div className="flex flex-col gap-3 relative z-10">
-            <span className="text-[12px] text-brand-indigo font-[510] tracking-[0.1em] uppercase">이 화면에서 확인할 것</span>
-            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">첫 화면에서 바로 읽히는 흐름</h2>
-          </div>
-          <div className="flex flex-col gap-4">
-            {proofSteps.map((step, idx) => (
-              <div key={step.title} className="flex gap-4 relative">
-                <div className="flex flex-col items-center mt-3">
-                  <div className="w-2.5 h-2.5 rounded-full border border-brand-indigo bg-brand-indigo/20 shadow-[0_0_8px_rgba(94,106,210,0.4)]"></div>
-                  {idx !== proofSteps.length - 1 && (
-                    <div className="w-[1px] h-full bg-gradient-to-b from-brand-indigo/40 to-transparent mt-2"></div>
-                  )}
-                </div>
-                <div className="flex flex-col gap-1.5 bg-white/[0.02] border border-white/[0.04] rounded-lg p-5 flex-1 hover:bg-white/[0.04] transition-colors">
-                  <span className="text-[12px] text-text-tertiary font-[510] tracking-wide">{step.eyebrow}</span>
-                  <strong className="text-[16px] font-[510] text-text-primary">{step.title}</strong>
-                  <p className="text-[15px] text-text-secondary leading-[1.6] mt-1">{step.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="linear-card p-8 flex flex-col gap-8 shadow-sm hover:bg-white/[0.05] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-          <div className="flex flex-col gap-3 relative z-10">
-            <span className="text-[12px] text-accent-violet font-[510] tracking-[0.1em] uppercase">운영 기준</span>
-            <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">같은 흐름을 더 적은 운영 부담으로 반복합니다</h2>
-            <p className="text-[15px] text-text-secondary leading-[1.6]">
-              핵심 흐름을 보여준 뒤에는, 같은 세션을 더 적은 비용과 시간으로 운영할 수 있다는 점도
-              함께 확인합니다.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 relative z-10">
-            {homeMetrics.map((metric) => (
-              <div
-                key={metric.label}
-                className="rounded-xl border border-white/[0.05] bg-black/20 p-5"
-              >
-                <span className="text-[11px] text-text-tertiary uppercase tracking-wider font-[510]">
-                  {metric.label}
-                </span>
-                <strong className="mt-3 block text-[22px] font-[590] tracking-[-0.24px] text-text-primary">
-                  {metric.value}
-                </strong>
-                <span className="mt-1 block text-[12px] leading-[1.5] text-text-quaternary">
-                  {metric.note}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <ul className="flex flex-col gap-4 mt-2 relative z-10">
-            {operatingCostBars.map((bar) => (
-              <li key={bar.label} className="flex flex-col gap-3 bg-black/20 border border-white/[0.05] rounded-lg p-5">
-                <div className="flex justify-between items-end">
-                  <span className="text-[14px] font-[510] text-text-primary">{bar.label}</span>
-                  <strong className="text-[16px] font-mono text-accent-violet">{bar.unit}</strong>
-                </div>
-                <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden" aria-hidden="true">
-                  <div 
-                    className="h-full bg-brand-indigo transition-all duration-1000 ease-out rounded-full opacity-80" 
-                    style={{ width: `${bar.percent}%` }} 
-                  />
-                </div>
+          <ul className="grid gap-3">
+            {buyerPains.map((pain) => (
+              <li key={pain} className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-4 text-[14px] leading-[1.6] text-text-secondary">
+                {pain}
               </li>
             ))}
           </ul>
-        </article>
+        </aside>
       </section>
 
-      {/* Practice Problems */}
+      <section id="operating-loop" className="linear-card p-1 relative overflow-hidden">
+        <div className="bg-panel-dark rounded-[calc(var(--radius-card)-4px)] p-10 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-12">
+            <div className="flex flex-col justify-between gap-8">
+              <div className="flex flex-col gap-4">
+                <span className="text-[12px] text-brand-indigo font-[510] tracking-[0.1em] uppercase">
+                  운영 루프
+                </span>
+                <h2 className="text-[32px] font-[400] leading-[1.13] tracking-[-0.704px] text-text-primary">
+                  한 번의 훈련 후, 강사는 다음에 무엇을 물어볼지 바로 압니다.
+                </h2>
+                <p className="text-[16px] leading-[1.65] text-text-secondary">
+                  제출 코드, 질문, 답변, 리포트가 한 학습자의 훈련 기록으로 이어집니다.
+                </p>
+              </div>
+
+              <div className="rounded-panel border border-white/[0.06] bg-white/[0.02] p-5">
+                <div className="text-[11px] font-[510] uppercase tracking-[0.12em] text-text-tertiary">
+                  대표 세션
+                </div>
+                <h3 className="mt-2 text-[20px] font-[590] tracking-[-0.24px] text-text-primary">
+                  {featuredProblem.title}
+                </h3>
+                <p className="mt-2 text-[14px] leading-[1.6] text-text-secondary">
+                  {featuredProblem.elevatorPitch}
+                </p>
+                <Link href={`/problems/${featuredProblem.id}`} className="btn-primary mt-5 px-5 py-2.5 text-[14px]">
+                  이 세션으로 들어가기
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              {operatingLoop.map((step) => (
+                <article key={step.title} className="flex gap-4 rounded-xl border border-white/[0.05] bg-white/[0.02] p-5">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-comfortable border border-brand-indigo/30 bg-brand-indigo/10 text-[12px] font-[590] text-brand-indigo">
+                    {step.eyebrow}
+                  </span>
+                  <div className="flex flex-col gap-1.5">
+                    <strong className="text-[16px] font-[510] text-text-primary">{step.title}</strong>
+                    <p className="text-[14px] leading-[1.6] text-text-secondary">{step.detail}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="linear-card p-6 shadow-sm">
+        <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] text-accent-violet font-[510] tracking-[0.1em] uppercase">
+              구매자 takeaway
+            </span>
+              <h2 className="text-[24px] font-[400] tracking-[-0.288px] text-text-primary">
+                훈련이 끝나면 학생별 약점과 다음 질문이 바로 보입니다
+              </h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {buyerTakeaways.map((takeaway) => (
+              <div key={takeaway.label} className="rounded-xl border border-white/[0.05] bg-black/20 p-4">
+                <div className="text-[11px] font-[510] uppercase tracking-[0.12em] text-text-tertiary">
+                  {takeaway.label}
+                </div>
+                <p className="mt-2 text-[14px] leading-[1.5] text-text-secondary">{takeaway.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="practice-problems" className="flex flex-col gap-8 pt-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-border-subtle pb-6">
           <div className="flex flex-col gap-2">
-            <span className="text-[12px] text-text-tertiary font-[510] tracking-[0.1em] uppercase">다른 연습 문제</span>
-            <h2 className="text-[32px] font-[400] tracking-[-0.704px] text-text-primary">같은 흐름으로 확인할 추가 문제</h2>
+            <span className="text-[12px] text-text-tertiary font-[510] tracking-[0.1em] uppercase">
+              훈련 문제
+            </span>
+            <h2 className="text-[32px] font-[400] tracking-[-0.704px] text-text-primary">
+              같은 운영 흐름으로 반복할 수 있는 문제들
+            </h2>
           </div>
           <div className="pill bg-white/[0.02] border-border-subtle flex items-center gap-2 py-1.5 px-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-status-emerald"></div>
-            <span className="text-text-secondary font-[400] text-[13px]">{problemCatalog.length}개 문제 수록</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-status-emerald" />
+            <span className="text-text-secondary font-[400] text-[13px]">{problemCatalog.length}개 훈련 문제</span>
           </div>
         </div>
 
@@ -310,13 +194,17 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between relative z-10 pb-4 border-b border-white/[0.05]">
                 <span className="text-[11px] font-mono text-text-tertiary uppercase tracking-wider">{problem.pattern}</span>
-                <span className={`pill text-[10px] ${problem.difficulty === 'easy' ? 'text-status-emerald border-status-emerald/30 bg-status-emerald/10' : problem.difficulty === 'hard' ? 'text-security-lavender border-security-lavender/30 bg-security-lavender/10' : 'bg-white/5 border-white/10'}`}>
+                <span className={`pill text-[10px] ${problem.difficulty === "easy" ? "text-status-emerald border-status-emerald/30 bg-status-emerald/10" : problem.difficulty === "hard" ? "text-security-lavender border-security-lavender/30 bg-security-lavender/10" : "bg-white/5 border-white/10"}`}>
                   {DIFFICULTY_LABEL[problem.difficulty]}
                 </span>
               </div>
               <div className="flex flex-col gap-2 mt-2 relative z-10 flex-1">
-                <h3 className="text-[18px] font-[510] tracking-tight group-hover:text-white transition-colors">{problem.title}</h3>
-                <p className="text-[14px] text-text-secondary line-clamp-2 leading-[1.5] mt-1">{problem.elevatorPitch}</p>
+                <h3 className="text-[18px] font-[510] tracking-tight group-hover:text-white transition-colors">
+                  {problem.title}
+                </h3>
+                <p className="text-[14px] text-text-secondary line-clamp-2 leading-[1.5] mt-1">
+                  {problem.elevatorPitch}
+                </p>
               </div>
             </Link>
           ))}
