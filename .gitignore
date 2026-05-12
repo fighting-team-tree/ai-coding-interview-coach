@@ -79,6 +79,7 @@ output/competition-video/
 
 # bkit plugin files (local AI tooling state)
 .bkit/
+.sisyphus/
 docs/.bkit-memory.json
 docs/.pdca-status.json
 docs/.pdca-snapshots/
