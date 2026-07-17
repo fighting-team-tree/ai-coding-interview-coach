@@ -93,3 +93,15 @@ apps/web/test-results/
 
 # AI CHAMPION
 docs/ai-champion-docx/
+
+# lazycode
+.omo
+
+# oh my codex
+.omx
+
+# antigravity cli
+.antigravitycli
+
+# local mp4 output
+output
